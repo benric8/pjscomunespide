@@ -16,6 +16,7 @@ import pe.gob.pj.pide.dao.dto.RequestEvaluarSolicitudCuotaDTO;
 import pe.gob.pj.pide.dao.dto.RequestModificarPermisoDTO;
 import pe.gob.pj.pide.dao.dto.RequestRegistrarEntidadDTO;
 import pe.gob.pj.pide.dao.dto.RequestRegistrarIpEntidadDTO;
+import pe.gob.pj.pide.dao.dto.RequestOperacionDTO;
 import pe.gob.pj.pide.dao.dto.RequestRegistrarSolicitudCuotaDTO;
 import pe.gob.pj.pide.dao.dto.pide.IpEntidadDTO;
 import pe.gob.pj.pide.dao.dto.pide.SolicitudDTO;
@@ -102,7 +103,7 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 			case ConstantesSCPide.TIPO_SOLICITUD_IMPACTO_ACCESO:
 				permi = new MovAsignacionAcceso();
 				transaccionIps = solicitud.getListaIps()!=null && !solicitud.getListaIps().isEmpty();
-				if(maeOperacion.getRequiereAbrobacionAcceso().equalsIgnoreCase(ConstantesSCPide.RPTA_0)) {
+				if(maeOperacion.getRequiereAprobacionAcceso().equalsIgnoreCase(ConstantesSCPide.RPTA_0)) {
 					estadoSolicitud.setIdEstadoSolicitud(ConstantesSCPide.ESTADO_SOLICITUD_ID_APROBADO);
 					if(transaccionIps) {
 						for(IpEntidadDTO item : solicitud.getListaIps()) {
@@ -331,7 +332,7 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 				permi = permi != null ? permi : new MovAsignacionAcceso();
 				
 				boolean transaccionPermiso = false;
-				if(soli.getTipoSolicitud().getImpacto().trim().equalsIgnoreCase(ConstantesSCPide.TIPO_SOLICITUD_IMPACTO_ACCESO) && soli.getOperacion().getRequiereAbrobacionAcceso().equalsIgnoreCase(ConstantesSCPide.RPTA_1)) {
+				if(soli.getTipoSolicitud().getImpacto().trim().equalsIgnoreCase(ConstantesSCPide.TIPO_SOLICITUD_IMPACTO_ACCESO) && soli.getOperacion().getRequiereAprobacionAcceso().equalsIgnoreCase(ConstantesSCPide.RPTA_1)) {
 					
 					permi.setCAud(ConstantesSCPide.SQL_ACCION_INSERT);
 					permi.getMaacceso().setIdEntidad(soli.getEntidad().getIdEntidad());
@@ -575,6 +576,89 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 			logger.error("{} Error: {}", cuo, e.getMessage());
 			e.printStackTrace();
 		}
+		return rpta;
+	}
+	@Override
+	public boolean registrarOperacion(String cuo, RequestOperacionDTO operacion) throws Exception {
+		MaeOperacion opera;
+		TypedQuery<MaeOperacion> query = this.sf.getCurrentSession().createNamedQuery(MaeOperacion.Q_OPERACION_BY_ENDPOINT,
+				MaeOperacion.class);
+		query.setParameter(MaeOperacion.P_ENDPOINT_OPERACION, operacion.getEndpoint());
+		opera = query.getResultStream().findFirst().orElse(new MaeOperacion());
+		if (opera.getIdOperacion()!= null && opera.getIdOperacion() > 0) {
+			logger.warn("{} EL endpoint ingresado ya se encuentra registrado.", cuo);
+			throw new Exception("El endpoint con el ruc ingresado ya se encuentra registrado.");
+		} else {
+			opera.setNombre(operacion.getNombre());
+			opera.setOperacion(operacion.getOperacion());
+			opera.setDescripcion(operacion.getDescripcion());
+			opera.setEndpoint(operacion.getEndpoint());
+			opera.setCuotaDefecto(operacion.getCuotaDefecto());
+			opera.setRequiereAprobacionAcceso(operacion.getRequiereAprobacionAcceso());
+			opera.setRequiereAprobacionCuota(operacion.getRequiereAprobacionCuota());
+			opera.setRequiereAprobacionEstado(operacion.getRequiereAprobacionEstado());
+			opera.setRequiereAprobacionIps(operacion.getRequiereAprobacionIps());
+			opera.setActivo(operacion.getActivo());
+			
+			
+			opera.setCAud(ConstantesSCPide.SQL_ACCION_UPDATE);
+			opera.setFAud(UtilsSCPide.getFechaActualDate());
+			opera.setCAudIp(UtilsSCPide.getIp());
+			opera.setCAudMcAddr(UtilsSCPide.getMac());
+			opera.setCAudPc(UtilsSCPide.getPc());
+			opera.setFechaRegistro(UtilsSCPide.getFechaActualDate());
+			
+			
+			this.sf.getCurrentSession().save(opera);
+		}
+		return opera.getIdOperacion() > 0;
+	}
+	
+	@Override
+	public boolean modificarOperacion(String cuo, RequestOperacionDTO operacion, Integer idOperacion) throws Exception {
+		
+		
+		boolean rpta=false;
+		MaeOperacion operacionPrevia;
+		this.sf.getCurrentSession().enableFilter(MaeOperacion.F_ID_OPERACION)
+		.setParameter(MaeOperacion.P_ID_OPERACION, idOperacion);	
+		TypedQuery<MaeOperacion> query = this.sf.getCurrentSession().createNamedQuery(MaeOperacion.Q_FIND_BY_FILTERS,
+				MaeOperacion.class);
+		
+		operacionPrevia = query.getResultStream().findFirst().orElse(new MaeOperacion());
+		
+		if(operacionPrevia == null)  {
+			throw new Exception("No se pudo realizar la modificación debido a que no se encontro coincidencias para la operacion ingresado.");
+		}
+		
+		try {
+
+			operacionPrevia.setOperacion(operacion.getOperacion());
+			operacionPrevia.setDescripcion(operacion.getDescripcion());
+			operacionPrevia.setEndpoint(operacion.getEndpoint());
+			operacionPrevia.setCuotaDefecto(operacion.getCuotaDefecto());
+			operacionPrevia.setRequiereAprobacionAcceso(operacion.getRequiereAprobacionAcceso());
+			operacionPrevia.setRequiereAprobacionCuota(operacion.getRequiereAprobacionCuota());
+			operacionPrevia.setRequiereAprobacionEstado(operacion.getRequiereAprobacionEstado());
+			operacionPrevia.setRequiereAprobacionIps(operacion.getRequiereAprobacionIps());
+			operacionPrevia.setActivo(operacion.getActivo());
+			
+			operacionPrevia.setCAud(ConstantesSCPide.SQL_ACCION_UPDATE);
+			operacionPrevia.setFAud(UtilsSCPide.getFechaActualDate());
+			operacionPrevia.setCAudIp(UtilsSCPide.getIp());
+			operacionPrevia.setCAudMcAddr(UtilsSCPide.getMac());
+			operacionPrevia.setCAudPc(UtilsSCPide.getPc());
+			operacionPrevia.setFechaRegistro(UtilsSCPide.getFechaActualDate());
+			
+			this.sf.getCurrentSession().update(operacionPrevia);
+			
+			rpta = operacionPrevia.getIdOperacion()  > 0;
+			
+		} catch (Exception e) {
+			logger.error("{} Error en dao registrarUsuario: {}", cuo, e.getMessage());
+			e.printStackTrace();
+		}
+		
 		return rpta;
 	}
 

@@ -15,7 +15,8 @@ public class ConstantesSCPide {
 	public final static String PATTERN_NUMBER = "[0-9]+";
 	public static final String PATTERN_IP = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 	public static final String PATTERN_MAC = "([0-9A-F]{2}[:-]){5}([0-9A-F]{2})";
-
+	public static final String PATTERN_ENDPOINT = "^/[a-zA-Z0-9\\-]+/[a-zA-Z0-9\\-]+/[a-zA-Z0-9\\-]+$";
+	
 	public static final String PATTERN_FECHA_YYYYMMDD = "yyyyMMdd";
 	public static final String PATTERN_FECHA_YYYY_MM_DD = "yyyy/MM/dd";
 	public static final String PATTERN_FECHA_YYYY_MM_DD_ = "yyyy-MM-dd";

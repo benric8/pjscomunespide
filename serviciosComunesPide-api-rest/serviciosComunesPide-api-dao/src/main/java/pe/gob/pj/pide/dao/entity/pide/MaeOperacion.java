@@ -29,6 +29,8 @@ import pe.gob.pj.pide.dao.utils.ConstantesSCPide;
 @Filters(value = {@Filter(name = MaeOperacion.F_ID_OPERACION, condition = "N_OPERACION=:idOperacion")})
 @NamedQuery(name = MaeOperacion.Q_OPERACION_BY_ACTIVO, query = "SELECT mo FROM MaeOperacion mo WHERE mo.activo = '1' ")
 @NamedQuery(name = MaeOperacion.Q_OPERACION_ACTIVO_BY_OPERACION, query = "SELECT mo FROM MaeOperacion mo WHERE mo.activo = '1' AND upper(operacion) LIKE :operacion ORDER BY operacion ")
+@NamedQuery(name = MaeOperacion.Q_OPERACION_BY_ENDPOINT, query = "SELECT mo FROM MaeOperacion mo WHERE mo.endpoint = :endpoint")
+@NamedQuery(name = MaeOperacion.Q_FIND_BY_FILTERS, query = "SELECT mo FROM MaeOperacion mo")
 public class MaeOperacion extends Auditoria implements Serializable{/**
 	 * 
 	 */
@@ -38,9 +40,12 @@ public class MaeOperacion extends Auditoria implements Serializable{/**
 	
 	public static final String Q_OPERACION_BY_ACTIVO = "MaeOperacion.findByActivo";
 	public static final String Q_OPERACION_ACTIVO_BY_OPERACION = "MaeOperacion.findByActivoOperacion";
+	public static final String Q_OPERACION_BY_ENDPOINT = "MaeOperacion.findByEndpointOperacion";
+	public static final String Q_FIND_BY_FILTERS = "MaeOperacion.findByFilters";
 	
 	public static final String P_OPERACION = "operacion";
 	public static final String P_ID_OPERACION = "idOperacion";
+	public static final String P_ENDPOINT_OPERACION = "endpoint";
 	
 	@SequenceGenerator(name = "GENERATOR_MAE_OPERACION", sequenceName = "USEQ_MAE_OPERACION", schema = ConstantesSCPide.ESQUEMA_PIDE, allocationSize = 1)
 	@GeneratedValue(generator = "GENERATOR_MAE_OPERACION",strategy = GenerationType.SEQUENCE)
@@ -64,7 +69,7 @@ public class MaeOperacion extends Auditoria implements Serializable{/**
 	private Integer cuotaDefecto;
 	
 	@Column(name="L_APROBACION_ACCESO")
-	private String requiereAbrobacionAcceso;
+	private String requiereAprobacionAcceso;
 	
 	@Column(name="L_APROBACION_CUOTA")
 	private String requiereAprobacionCuota;

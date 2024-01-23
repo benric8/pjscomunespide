@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import pe.gob.pj.pide.dao.dto.GlobalResponseDTO;
@@ -20,8 +21,10 @@ import pe.gob.pj.pide.dao.dto.RequestEvaluarSolicitudCuotaDTO;
 import pe.gob.pj.pide.dao.dto.RequestModificarPermisoDTO;
 import pe.gob.pj.pide.dao.dto.RequestRegistrarEntidadDTO;
 import pe.gob.pj.pide.dao.dto.RequestRegistrarIpEntidadDTO;
+import pe.gob.pj.pide.dao.dto.RequestOperacionDTO;
 import pe.gob.pj.pide.dao.dto.RequestRegistrarSolicitudCuotaDTO;
 import pe.gob.pj.pide.dao.dto.pide.SolicitudDTO;
+import pe.gob.pj.pide.dao.dto.pide.UsuarioDTO;
 import pe.gob.pj.pide.dao.utils.ConstantesSCPide;
 import pe.gob.pj.pide.dao.utils.UtilsSCPide;
 import pe.gob.pj.pide.service.RegistrosService;
@@ -134,6 +137,49 @@ public class RegistrosApi implements Serializable{
 			res.setCodigo(ConstantesSCPide.C_500);
 			res.setDescripcion(UtilsSCPide.isNull(e.getCause()).concat(e.getMessage()));			
 			logger.error("{} Error al evaluar solicitu cuota: {}", cuo , res.getDescripcion());
+		}
+		return new ResponseEntity<GlobalResponseDTO>(res, HttpStatus.OK);
+	}
+	@RequestMapping(value = "/registrarOperacion", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<GlobalResponseDTO> registrarOperacion(@RequestAttribute String cuo, @Validated @RequestBody RequestOperacionDTO request){
+		GlobalResponseDTO res = new GlobalResponseDTO();
+		try {
+			logger.info("{}Inicio de endpoint:{}",cuo,"registrarOperacion");
+			res.setCodigo(ConstantesSCPide.C_200);
+			res.setDescripcion("Realizando registro de operacion.");
+			boolean rpta = serv.registrarOperacion(cuo, request);
+			if(rpta) {
+				res.setDescripcion("Registro de operacion, exitoso.");
+			}else {
+				res.setDescripcion("Registro de operacion, fallido.");
+			}
+			res.setData(rpta ? "1" : "0");
+		} catch (Exception e) {
+			res.setCodigo(ConstantesSCPide.C_500);
+			res.setDescripcion(UtilsSCPide.isNull(e.getCause()).concat(e.getMessage()));			
+			logger.error("{} Error al registrar operacion: {}", cuo , res.getDescripcion());
+		}
+		return new ResponseEntity<GlobalResponseDTO>(res, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/modificarOperacion", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE,  produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<GlobalResponseDTO> modificarUsuario(@RequestAttribute String cuo, @Validated @RequestBody RequestOperacionDTO request, @RequestParam Integer idOperacion) {
+		GlobalResponseDTO res = new GlobalResponseDTO();
+		try {
+			logger.info("{}Inicio de endpoint:{}",cuo,"modificarOperacion");
+			res.setCodigo(ConstantesSCPide.C_200);
+			res.setDescripcion("Realizando modificación de la Operacion.");
+			boolean rpta = serv.modificarOperacion(cuo, request,idOperacion);
+			if(rpta) {
+				res.setDescripcion("Modificación de Operacion, exitoso.");
+			}else {
+				res.setDescripcion("Modificación de Operacion, fallido.");
+			}
+			res.setData(rpta ? "1" : "0");
+		} catch (Exception e) {
+			res.setCodigo(ConstantesSCPide.C_500);
+			res.setDescripcion(UtilsSCPide.isNull(e.getCause()).concat(e.getMessage()));			
+			logger.error("{} Error en modificarOperacion: {}", cuo , res.getDescripcion());
 		}
 		return new ResponseEntity<GlobalResponseDTO>(res, HttpStatus.OK);
 	}
