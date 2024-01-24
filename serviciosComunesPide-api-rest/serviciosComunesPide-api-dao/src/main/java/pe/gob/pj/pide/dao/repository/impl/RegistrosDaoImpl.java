@@ -587,7 +587,7 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 		opera = query.getResultStream().findFirst().orElse(new MaeOperacion());
 		if (opera.getIdOperacion()!= null && opera.getIdOperacion() > 0) {
 			logger.warn("{} EL endpoint ingresado ya se encuentra registrado.", cuo);
-			throw new Exception("El endpoint con el ruc ingresado ya se encuentra registrado.");
+			throw new Exception("El endpoint ingresado ya se encuentra registrado.");
 		} else {
 			opera.setNombre(operacion.getNombre());
 			opera.setOperacion(operacion.getOperacion());
@@ -655,7 +655,7 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 			rpta = operacionPrevia.getIdOperacion()  > 0;
 			
 		} catch (Exception e) {
-			logger.error("{} Error en dao registrarUsuario: {}", cuo, e.getMessage());
+			logger.error("{} Error en dao modificarOperacion: {}", cuo, e.getMessage());
 			e.printStackTrace();
 		}
 		

@@ -24,7 +24,6 @@ import pe.gob.pj.pide.dao.dto.RequestRegistrarIpEntidadDTO;
 import pe.gob.pj.pide.dao.dto.RequestOperacionDTO;
 import pe.gob.pj.pide.dao.dto.RequestRegistrarSolicitudCuotaDTO;
 import pe.gob.pj.pide.dao.dto.pide.SolicitudDTO;
-import pe.gob.pj.pide.dao.dto.pide.UsuarioDTO;
 import pe.gob.pj.pide.dao.utils.ConstantesSCPide;
 import pe.gob.pj.pide.dao.utils.UtilsSCPide;
 import pe.gob.pj.pide.service.RegistrosService;
