@@ -31,7 +31,7 @@ public class EncryptUtils {
 	static final Logger logger = Logger.getLogger(EncryptUtils.class.getName());
 	
 	private static final String defaultKey = "qweiuierwo";
-	private static final char[] PASSWORD = (ConfiguracionPropiedades.getInstance().getProperty(ConstantesSCPide.Seguridad.SECRET_TOKEN)).toCharArray();
+	private static final char[] PASSWORD = ProjectProperties.getInstance().getSeguridadSecretToken().toCharArray();
     private static final byte[] SALT = { (byte) 0xde, (byte) 0x33, (byte) 0x10, (byte) 0x12, (byte) 0xde, (byte) 0x33,(byte) 0x10, (byte) 0x12, };
 
 	public static String MD5 = "MD5";

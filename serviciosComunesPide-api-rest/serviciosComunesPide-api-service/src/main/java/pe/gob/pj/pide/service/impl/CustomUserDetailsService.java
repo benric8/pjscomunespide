@@ -16,76 +16,68 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import pe.gob.pj.pide.dao.entity.Role;
-import pe.gob.pj.pide.dao.entity.User;
-import pe.gob.pj.pide.dao.repository.SegAudServicioDao;
-import pe.gob.pj.pide.dao.utils.ConfiguracionPropiedades;
-import pe.gob.pj.pide.dao.utils.ConstantesSCPide;
+import pe.gob.pj.pide.dao.dto.seguridad.RolDTO;
+import pe.gob.pj.pide.dao.dto.seguridad.RoleSecurity;
+import pe.gob.pj.pide.dao.dto.seguridad.UserSecurity;
+import pe.gob.pj.pide.dao.dto.seguridad.UsuarioDTO;
+
+import org.springframework.security.core.userdetails.User;
+
+
 import pe.gob.pj.pide.dao.utils.UtilsSCPide;
-import pe.gob.pj.seguridad.client.dto.SeguridadDTO;
-import pe.gob.pj.seguridad.client.dto.TokenDTO;
-import pe.gob.pj.seguridad.client.dto.Usuario;
-import pe.gob.pj.seguridad.client.service.ClientSeguridadService;
+import pe.gob.pj.pide.service.SeguridadService;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService, Serializable {
 
-	private static final long serialVersionUID = 1L;
+	
+	
 	private static final Logger logger = LogManager.getLogger(CustomUserDetailsService.class);
+
+	private static final long serialVersionUID = 1L;
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
+	
 	@Autowired
-	private SegAudServicioDao segAudServicioDao;
+	private SeguridadService service;
 
-	@Autowired
-	private ClientSeguridadService clientSeguridadService;
-
-	private String usuarioAuthSeguridad = ConfiguracionPropiedades.getInstance()
-			.getProperty(ConstantesSCPide.Seguridad.USUARIO_AUTH_SEGURIDAD);
-	private String passwordAuthSeguridad = ConfiguracionPropiedades.getInstance()
-			.getProperty(ConstantesSCPide.Seguridad.PASSWORD_AUTH_SEGURIDAD);
+	public CustomUserDetailsService(SeguridadService service, PasswordEncoder passwordEncoder) {
+		super();
+		this.service = service;
+		this.passwordEncoder = passwordEncoder;
+		// TODO Auto-generated constructor stub
+	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user = new User();
-		String cuo = UtilsSCPide.obtenerCodigoUnico();
+		
+		UserSecurity user = new UserSecurity();
 		try {
-			SeguridadDTO seg = new SeguridadDTO();
-			seg.setPasswordSpring(passwordAuthSeguridad);
-			seg.setUsuarioSpring(usuarioAuthSeguridad);
-
-			TokenDTO token = segAudServicioDao.getToken();
-			Usuario u = clientSeguridadService.recuperaUsuarioPorId(cuo, UtilsSCPide.isInt(username), token.getAccess_token());
-			if (u != null && u.getId() > 0) {
-				user.setId(u.getId().intValue());
-				user.setPassword(passwordEncoder.encode(u.getPassword()));
-				user.setName(u.getUsername());
-				List<Role> roles = new ArrayList<Role>();
-				if (u.getRoles() != null) {
-					for (pe.gob.pj.seguridad.client.dto.Role r : u.getRoles()) {
-						Role rol = new Role();
-						rol.setId(r.getId().intValue());
-						rol.setName(r.getNombre());
-						roles.add(rol);
-					}
-				}
+			UsuarioDTO u = service.recuperaInfoUsuario("", username);
+			if(u != null && u.getId() > 0) {
+				user.setId(u.getId());
+				user.setName(u.getCUsuario());
+				user.setPassword(passwordEncoder.encode(u.getCClave()));
+				List<RoleSecurity> roles = new ArrayList<RoleSecurity>();
+				List<RolDTO> rolesB = service.recuperarRoles("", username);
+				rolesB.forEach(rol ->{
+					roles.add(new RoleSecurity(rol.id, rol.getCRol()));
+				});
 				user.setRoles(roles);
 			} else {
-				logger.error("{} Usuario con ID: {} no existe.", cuo, username);
 				throw new Exception("Usuario con ID:  " + username + " not found");
 			}
 		} catch (Exception e) {
-			logger.error("{} error al atenticar con spring security: {}", cuo, UtilsSCPide.convertExceptionToString(e));
-			logger.fatal(cuo, e);
-			new UsernameNotFoundException("Usuario con ID:  " + username + " no existe");
+			logger.debug("ERROR AL RECUPERAR USUARIO Y ROLES PARA SPRING SECURITY: " + UtilsSCPide.convertExceptionToString(e));			
+			e.printStackTrace();
+			new UsernameNotFoundException("Usuario con ID:  " + username + " not found");
 		}
-		return new org.springframework.security.core.userdetails.User(user.getName(), user.getPassword(),
-				getAuthorities(user));
+		
+		return new User(user.getName(), user.getPassword(), getAuthorities(user));
 	}
-
-	private static Collection<? extends GrantedAuthority> getAuthorities(User user) {
+	
+	private static Collection<? extends GrantedAuthority> getAuthorities(UserSecurity user) {
 		String[] userRoles = user.getRoles().stream().map((role) -> role.getName()).toArray(String[]::new);
 		Collection<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(userRoles);
 		return authorities;

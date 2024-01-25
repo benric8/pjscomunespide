@@ -115,18 +115,8 @@
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 		</dependency>
-		<!-- Cliente seguridad -->
-		<dependency>
-			<groupId>pe.gob.pj.ws.cliente.seguridad</groupId>
-			<artifactId>seguridad-client-rest</artifactId>
-			<version>1.0.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-web</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+		
+		
 		<!-- Cliente reniec -->
 		<dependency>
 			<groupId>pe.gob.pj.ws.cliente</groupId>

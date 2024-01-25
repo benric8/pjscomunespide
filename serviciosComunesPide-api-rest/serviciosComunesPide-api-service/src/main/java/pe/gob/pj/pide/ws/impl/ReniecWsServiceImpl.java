@@ -4,8 +4,8 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import org.springframework.stereotype.Service;
 
-import pe.gob.pj.pide.dao.utils.ConfiguracionPropiedades;
 import pe.gob.pj.pide.dao.utils.ConstantesSCPide;
+import pe.gob.pj.pide.dao.utils.ProjectProperties;
 import pe.gob.pj.pide.dao.utils.UtilsSCPide;
 import pe.gob.pj.pide.ws.ReniecWsService;
 import pe.gob.pj.pide.ws.bean.ParamConfigReniecBean;
@@ -28,9 +28,9 @@ public class ReniecWsServiceImpl implements ReniecWsService {
 		try {
 						
 			ParamConfigReniecBean beanParam = new ParamConfigReniecBean();
-			beanParam.setEndpoint(ConfiguracionPropiedades.getInstance().getProperty(ConstantesSCPide.Reniec.STRING_END_POINT));
-			beanParam.setDniConsultante(ConfiguracionPropiedades.getInstance().getProperty(ConstantesSCPide.Reniec.STRING_DNI_CONSULTANTE));
-			beanParam.setTimeout(ConfiguracionPropiedades.getInstance().getProperty(ConstantesSCPide.Reniec.STRING_TIME_OUT));
+			beanParam.setEndpoint(ProjectProperties.getInstance().getEndPointReniec());
+			beanParam.setDniConsultante(ProjectProperties.getInstance().getDniConsultanteReniec());
+			beanParam.setTimeout(ProjectProperties.getInstance().getTimeOutReniec());
 			
 			ConsultaReniec consultaReniecRequest = new ConsultaReniec();
 			consultaReniecRequest.setReqDni(preRegistro.getcNumeIdentidad());

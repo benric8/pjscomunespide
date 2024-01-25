@@ -15,8 +15,8 @@ public class CaptchaUtils {
 	public static final boolean validCaptcha(String token, String remoteIp, String cuo) {
 		try {
 			
-			String URL = ConfiguracionPropiedades.getInstance().getProperty(ConstantesSCPide.Captcha.CAPTCHA_URL);
-			String TOKEN = ConfiguracionPropiedades.getInstance().getProperty(ConstantesSCPide.Captcha.CAPTCHA_TOKEN);
+			String URL = ProjectProperties.getInstance().getCaptchaUrl();
+			String TOKEN = ProjectProperties.getInstance().getCaptchaToken();
 			
 			RestTemplate plantilla = new RestTemplate();			
 			UriComponents builder = UriComponentsBuilder.fromHttpUrl(URL)

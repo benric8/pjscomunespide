@@ -7,6 +7,15 @@ public class ConstantesSCPide {
 	public static final int TOKEN_TIEMPO_PARA_EXPIRAR_SEGUNDOS = 300;
 	public static final int TOKEN_TIEMPO_PARA_REFRESCAR_SEGUNDOS = 180;
 	
+	public static final int NRO_VECES_REFRESH_CON_TOKEN_EXPIRADO = 100;
+	public static final String TOKEN_ACCESO_NEUTRO = "io";
+	public static final String METHOD_CORTA_ULTIMA_BARRA_INVERTIDA = "PUT";
+	
+	public static final String TOKEN_ACCESO_INTERNO = "in";
+	public static final String TOKEN_OPERACION_SPLIT = "@";
+	public static final String AUD_JWT = "auditoriaJwt";
+	
+	public static final String AUD_IP = "auditoriaIp";
 	public static final String VERSION = "1.0.0";
 
 	public static final String ESQUEMA_SEGURIDAD = "seguridad";
@@ -58,16 +67,23 @@ public class ConstantesSCPide {
 	public static final String CLAIM_IP = "remoteIp";
 	public static final String CLAIM_NUMERO = "numero";
 	public static final String CLAIM_INIPAGE = "page_i";
+	public static final String CLAIM_ACCESO = "log_";
+	public static final String CLAIM_LIMIT= "limit";
 
+	public static final String C_EXITO  = "0000";
 	public static final String C_500 = "500";
 	public static final String C_404 = "404";
 	public static final String C_200 = "200";
 	public static final String C_400 = "400";
 	public static final String C_401 = "401";
 	public static final String C_403 = "403";
-	
+	public static final String C_E003 = "E003";
+	public static final String C_E002 = "E002";
 	public static final String STRING_S="S";
 	
+	public static final String X_EXITO = "La operación se realizo de manera exitosa.";
+	public static final String X_E003 = "Error al generar un nuevo token, el tiempo límite para refrescar el token enviado ha expirado.";
+	public static final String X_E002 = "Lo sentimos, hubo un problema al validar el token.";
 	//reniec
 	public static final String LETRA_VACIO="";
 	public static final String STRING_DOS= "2";

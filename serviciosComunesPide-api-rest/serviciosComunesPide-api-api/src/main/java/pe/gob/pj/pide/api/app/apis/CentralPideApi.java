@@ -9,9 +9,11 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,11 +27,12 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import pe.gob.pj.pide.dao.dto.GlobalResponseDTO;
-import pe.gob.pj.pide.dao.dto.ResponseLoginDTO;
+
 import pe.gob.pj.pide.dao.utils.ConstantesSCPide;
+import pe.gob.pj.pide.dao.utils.ProjectProperties;
 import pe.gob.pj.pide.dao.utils.SecurityConstants;
 import pe.gob.pj.pide.dao.utils.UtilsSCPide;
-import pe.gob.pj.pide.service.SegUsuarioService;
+import pe.gob.pj.pide.service.SeguridadService;
 
 @RestController
 public class CentralPideApi implements Serializable {
@@ -38,7 +41,8 @@ public class CentralPideApi implements Serializable {
 	private static final Logger logger = LogManager.getLogger(CentralPideApi.class);
 	
 	@Autowired
-	private SegUsuarioService segUsuarioService;
+	@Qualifier("seguridadService")
+	private SeguridadService seguridad ;
 
 	/**
 	 * Método que sirve para verificar versión actual del aplicativo
@@ -77,80 +81,104 @@ public class CentralPideApi implements Serializable {
 	 * @return un nuevo token
 	 */
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/seguridad/refresh", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<ResponseLoginDTO> refreshToken(@RequestParam String token, @RequestAttribute String ipRemota, @RequestAttribute String cuo) {
-		ResponseLoginDTO res = new ResponseLoginDTO();
-		try {
-			boolean acceso = segUsuarioService.getToken(cuo);
-			if(!acceso) {
-				res.setExededReload("1");
-				res.setCodigo(ConstantesSCPide.C_403);
-				return new ResponseEntity<>(res, HttpStatus.OK);
-			}
+	@GetMapping(value = "/seguridad/refresh")
+	public ResponseEntity<GlobalResponseDTO> refreshToken(@RequestAttribute(name = ConstantesSCPide.AUD_CUO) String cuo, 
+			@RequestAttribute(name=ConstantesSCPide.REMOTE_IP) String ipRemota,
+			@RequestParam(required = true) String token) {
+		GlobalResponseDTO res = new GlobalResponseDTO();
+		res.setCodigo(cuo.substring(1, cuo.length()-1));
+		try {			
 			byte[] signingKey = SecurityConstants.JWT_SECRET.getBytes();
-			res.setCodigo(ConstantesSCPide.C_500);
-			res.setExededReload("0");
-			res.setExededReloadAdmin("0");
+
+			Map<String, String> dataToken = new HashMap<String, String>();
 			try {
-				Jws<Claims> parsedToken = Jwts.parser().setSigningKey(signingKey).parseClaimsJws(token.replace("Bearer ", ""));
-				List<String> roles = (List<String>) parsedToken.getBody().get("rol");
-				String ipRemotaToken = parsedToken.getBody().get("remoteIp").toString();
-				int total = (int) parsedToken.getBody().get("numero");
+				String jwt = token.replace("Bearer ", "");
+				Jws<Claims> parsedToken = Jwts.parser().setSigningKey(signingKey).parseClaimsJws(jwt);
+				String accesoBase =  (String) parsedToken.getBody().get(ConstantesSCPide.CLAIM_ACCESO);
+				List<String> roles = (List<String>) parsedToken.getBody().get(ConstantesSCPide.CLAIM_ROL);
+				String ipRemotaToken = parsedToken.getBody().get(ConstantesSCPide.CLAIM_IP).toString();
+				int total = (int) parsedToken.getBody().get(ConstantesSCPide.CLAIM_NUMERO);
 				String subject = parsedToken.getBody().getSubject();
 				
 				Date ahora = new Date();
+				
+				int tiempoSegundosExpira = ProjectProperties.getInstance().getSeguridadTiempoExpiraSegundos();
+				int tiempoSegundosRefresh = ProjectProperties.getInstance().getSeguridadTiempoRefreshSegundos();
+				
 				Date limiteExpira = parsedToken.getBody().getExpiration();
-				Date limiteRefresh = UtilsSCPide.sumarRestarSegundos(limiteExpira, ConstantesSCPide.TOKEN_TIEMPO_PARA_REFRESCAR_SEGUNDOS);
-
-				Integer tiempoToken =  ConstantesSCPide.TOKEN_TIEMPO_PARA_EXPIRAR_SEGUNDOS * 1000;
-				if (ipRemota.equals(ipRemotaToken) && !ahora.after(limiteRefresh)) {
-					String tokenResult = Jwts.builder()
-							.signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
-							.setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
-							.setIssuer(SecurityConstants.TOKEN_ISSUER)
-							.setAudience(SecurityConstants.TOKEN_AUDIENCE)
-							.setSubject(subject).setExpiration(new Date(System.currentTimeMillis() + tiempoToken))
-							.claim("rol", roles)
-							.claim("remoteIp", ipRemota)
-							.claim("numero", total + 1)
-							.compact();
-					res.setCodigo(ConstantesSCPide.C_200);
-					res.setToken(tokenResult);
-					return new ResponseEntity<>(res, HttpStatus.OK);
+				Date limiteRefresh = UtilsSCPide.sumarRestarSegundos(limiteExpira, tiempoSegundosRefresh);
+				
+				if (ipRemota.equals(ipRemotaToken)) {
+					if(!ahora.after(limiteRefresh)) {
+							String tokenResult = Jwts.builder()
+								.signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
+								.setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
+								.setIssuer(SecurityConstants.TOKEN_ISSUER)
+								.setAudience(SecurityConstants.TOKEN_AUDIENCE)
+								.setSubject(subject).setExpiration(UtilsSCPide.sumarRestarSegundos(ahora, tiempoSegundosExpira))
+								.claim(ConstantesSCPide.CLAIM_ROL, roles)
+								.claim(ConstantesSCPide.CLAIM_IP, ipRemota)
+								.claim(ConstantesSCPide.CLAIM_ACCESO, accesoBase)
+								.claim(ConstantesSCPide.CLAIM_LIMIT, UtilsSCPide.sumarRestarSegundos(ahora, tiempoSegundosExpira+tiempoSegundosRefresh))
+								.claim(ConstantesSCPide.CLAIM_NUMERO, total + 1)
+								.compact();
+							
+						res.setCodigo(ConstantesSCPide.C_200);
+						res.setDescripcion(ConstantesSCPide.X_EXITO);
+						dataToken.put("token", tokenResult);
+						res.setData(dataToken);
+						return new ResponseEntity<>(res, HttpStatus.OK);
+					}else {
+						res.setCodigo(ConstantesSCPide.C_401);
+						res.setDescripcion(ConstantesSCPide.X_E003);
+						return new ResponseEntity<>(res, HttpStatus.OK);
+					}				
 				} else {
-					res.setExededReload("1");
 					res.setCodigo(ConstantesSCPide.C_401);
 					return new ResponseEntity<>(res, HttpStatus.UNAUTHORIZED);
 				}
 			} catch (ExpiredJwtException e) {
-				List<String> roles = (List<String>) e.getClaims().get("rol");
-				String ipRemotaToken = e.getClaims().get("remoteIp").toString();
-				int total = (int) e.getClaims().get("numero");
+				String accesoBase =  (String) e.getClaims().get(ConstantesSCPide.CLAIM_ACCESO);
+				List<String> roles = (List<String>) e.getClaims().get(ConstantesSCPide.CLAIM_ROL);
+				String ipRemotaToken = e.getClaims().get(ConstantesSCPide.CLAIM_IP).toString();
+				int total = (int) e.getClaims().get(ConstantesSCPide.CLAIM_NUMERO);
 				String subject = e.getClaims().getSubject();
 
 				Date ahora = new Date();
-				Date limiteExpira = e.getClaims().getExpiration();
-				Date limiteRefresh = UtilsSCPide.sumarRestarSegundos(limiteExpira, ConstantesSCPide.TOKEN_TIEMPO_PARA_REFRESCAR_SEGUNDOS);
 				
-				Integer tiempoToken = ConstantesSCPide.TOKEN_TIEMPO_PARA_EXPIRAR_SEGUNDOS * 1000;
+
+				int tiempoSegundosExpira = ProjectProperties.getInstance().getSeguridadTiempoExpiraSegundos();
+				int tiempoSegundosRefresh = ProjectProperties.getInstance().getSeguridadTiempoRefreshSegundos();
+				
+				Date limiteExpira = e.getClaims().getExpiration();
+				Date limiteRefresh = UtilsSCPide.sumarRestarSegundos(limiteExpira, tiempoSegundosRefresh);
+				
 				if (ipRemota.equals(ipRemotaToken)) {
-					String tokenResult = Jwts.builder()
-							.signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
-							.setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
-							.setIssuer(SecurityConstants.TOKEN_ISSUER)
-							.setAudience(SecurityConstants.TOKEN_AUDIENCE)
-							.setSubject(subject).setExpiration(new Date(System.currentTimeMillis() + tiempoToken))
-							.claim("rol", roles)
-							.claim("remoteIp", ipRemota)
-							.claim("numero", total + 1)
-							.compact();
-					res.setCodigo(ConstantesSCPide.C_200);
-					res.setToken(tokenResult);
-					res.setExededReload(ahora.after(limiteRefresh)?"1":"0");
-					return new ResponseEntity<>(res, HttpStatus.OK);
+					if(!ahora.after(limiteRefresh)) {
+						String tokenResult = Jwts.builder()
+								.signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
+								.setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
+								.setIssuer(SecurityConstants.TOKEN_ISSUER)
+								.setAudience(SecurityConstants.TOKEN_AUDIENCE)
+								.setSubject(subject).setExpiration(UtilsSCPide.sumarRestarSegundos(ahora, tiempoSegundosExpira))
+								.claim(ConstantesSCPide.CLAIM_ROL, roles)
+								.claim(ConstantesSCPide.CLAIM_IP, ipRemota)
+								.claim(ConstantesSCPide.CLAIM_ACCESO, accesoBase)
+								.claim(ConstantesSCPide.CLAIM_LIMIT, UtilsSCPide.sumarRestarSegundos(ahora, tiempoSegundosExpira+tiempoSegundosRefresh))
+								.claim(ConstantesSCPide.CLAIM_NUMERO, total + 1)
+								.compact();
+						res.setCodigo(ConstantesSCPide.C_200);
+						res.setDescripcion(ConstantesSCPide.X_EXITO);
+						dataToken.put("token", tokenResult);
+						res.setData(dataToken);
+						return new ResponseEntity<>(res, HttpStatus.OK);
+					}else {
+						res.setCodigo(ConstantesSCPide.C_E003);
+						res.setDescripcion(ConstantesSCPide.X_E003);
+						return new ResponseEntity<>(res, HttpStatus.OK);
+					}
 				} else {
 					res.setCodigo(ConstantesSCPide.C_401);
-					res.setExededReload("1");
 					logger.warn(
 							"{} No se ha encontrado coincidencias válidas del token anterior o se ha excedido el tiempo limite para refrescar token.",
 							cuo);
@@ -158,8 +186,9 @@ public class CentralPideApi implements Serializable {
 				}
 			}
 		} catch (Exception e) {
-			logger.error("{} error al intentar generar nuevo Token: {}", cuo,
-					UtilsSCPide.isNull(e.getCause()).concat(e.getMessage()));
+			res.setCodigo(ConstantesSCPide.C_E002);
+			res.setDescripcion(ConstantesSCPide.X_E002);
+			logger.error("{} error al intentar generar nuevo Token: {}", cuo, UtilsSCPide.isNull(e.getCause()).concat(e.getMessage()));
 		}
 		return new ResponseEntity<>(res, HttpStatus.UNAUTHORIZED);
 	}

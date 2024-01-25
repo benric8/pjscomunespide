@@ -9,8 +9,7 @@ import javax.xml.ws.handler.Handler;
 
 import org.springframework.stereotype.Service;
 
-import pe.gob.pj.pide.dao.utils.ConfiguracionPropiedades;
-import pe.gob.pj.pide.dao.utils.ConstantesSCPide;
+import pe.gob.pj.pide.dao.utils.ProjectProperties;
 import pe.gob.pj.pide.dao.utils.UtilsSCPide;
 import pe.gob.pj.pide.ws.SunatWsService;
 import pe.gob.pj.pide.ws.bean.EntidadPideBean;
@@ -36,13 +35,13 @@ public class SunatWsServiceImpl implements SunatWsService, Serializable {
 		EntidadPideBean entidad = new EntidadPideBean();
 		try {
 			ParamConfigPideBean entidadParametros = new ParamConfigPideBean();
-			entidadParametros.setCodigoAplicativo(ConfiguracionPropiedades.getInstance().getProperty(ConstantesSCPide.Pide.PARAM_CONFIG_CODIGO_APLICATIVO_PIDE));
-			entidadParametros.setCodigoCliente(ConfiguracionPropiedades.getInstance().getProperty(ConstantesSCPide.Pide.PARAM_CONFIG_CODIGO_CLIENTE_PIDE));
-			entidadParametros.setCodigoRol(ConfiguracionPropiedades.getInstance().getProperty(ConstantesSCPide.Pide.PARAM_CONFIG_CODIGO_ROL_PIDE));
-			entidadParametros.setEndpoint(ConfiguracionPropiedades.getInstance().getProperty(ConstantesSCPide.Pide.PARAM_CONFIG_ENDPOINT_PIDE));
-			entidadParametros.setPass(ConfiguracionPropiedades.getInstance().getProperty(ConstantesSCPide.Pide.PARAM_CONFIG_PASS_PIDE));
-			entidadParametros.setTimeout(ConfiguracionPropiedades.getInstance().getProperty(ConstantesSCPide.Pide.PARAM_CONFIG_TIMEOUT_PIDE));
-			entidadParametros.setUser(ConfiguracionPropiedades.getInstance().getProperty(ConstantesSCPide.Pide.PARAM_CONFIG_USER_PIDE));
+			entidadParametros.setCodigoAplicativo(ProjectProperties.getInstance().getCodigoAplicativoPide());
+			entidadParametros.setCodigoCliente(ProjectProperties.getInstance().getCodigoClientePide());
+			entidadParametros.setCodigoRol(ProjectProperties.getInstance().getCodigoRolPide());
+			entidadParametros.setEndpoint(ProjectProperties.getInstance().getEndpointPide());
+			entidadParametros.setPass(ProjectProperties.getInstance().getPassPide());
+			entidadParametros.setTimeout(ProjectProperties.getInstance().getTimeoutPide());
+			entidadParametros.setUser(ProjectProperties.getInstance().getUserPide());
 
 			RequestConsultarDatosPrincipalesRUCType requestDatosPrincipalesRUC = new RequestConsultarDatosPrincipalesRUCType();
 			requestDatosPrincipalesRUC.setCRUC(rucConsulta);
