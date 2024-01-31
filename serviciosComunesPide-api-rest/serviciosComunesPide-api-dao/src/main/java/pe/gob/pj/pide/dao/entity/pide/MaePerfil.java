@@ -64,5 +64,8 @@ public class MaePerfil extends Auditoria implements Serializable {/**
 	
 	@Column(name="L_ACTIVO")
 	private String activo;
+	
+	@Column(name="x_rol")
+	private String rol;;
 
 }

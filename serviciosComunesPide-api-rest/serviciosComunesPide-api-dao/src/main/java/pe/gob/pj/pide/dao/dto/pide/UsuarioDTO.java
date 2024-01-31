@@ -38,6 +38,7 @@ public class UsuarioDTO implements Serializable {
 	@JsonProperty("clave")
 	private String clave;
 	
+	private String codigoRol;
 	private String fechaCambioClave;
 	private String fechaRegistro;
 	private String nombrePerfil;

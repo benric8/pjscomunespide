@@ -54,6 +54,7 @@ public class SeguridadServiceDaoImpl implements SeguridadServiceDao {
 				user.setId(usr.getNUsuario());
 				user.setCClave(UtilsSCPide.isNull(usr.getCClave()));
 			}
+			log.info("usuario autenticado correctamente {}",Arrays.toString(params));
 		} catch (NoResultException not) {
 			log.info(cuo.concat("No se encontro usuario registrado en BD Seguridad con los datos ->").concat(Arrays.toString(params)));
 		} catch (Exception e) {
@@ -109,6 +110,7 @@ public class SeguridadServiceDaoImpl implements SeguridadServiceDao {
 	public String validarAccesoMetodo(String cuo, String usuario, String rol, String operacion) throws Exception {
 		StringBuilder rpta = new StringBuilder("");
 		Object[] params = {usuario,rol,operacion};
+		log.info("validamos el permiso del metodo {}",Arrays.stream(params));
 		try {
 			TypedQuery<MaeRolUsuario> query = this.sf.getCurrentSession().createNamedQuery(MaeRolUsuario.VALIDAR_ACCESO_METODO , MaeRolUsuario.class);
 			query.setParameter(MaeRolUsuario.P_COD_USUARIO, usuario);
@@ -121,6 +123,7 @@ public class SeguridadServiceDaoImpl implements SeguridadServiceDao {
 						rpta.append(x.getXOperacion());
 				});
 			}
+			log.info("validacion Exitosa",Arrays.toString(params));
 		} catch (NoResultException not) {
 			log.info(cuo.concat("No se encontro permiso a la operacion con el rol del usuario ").concat(Arrays.toString(params)));
 		} catch (Exception e) {

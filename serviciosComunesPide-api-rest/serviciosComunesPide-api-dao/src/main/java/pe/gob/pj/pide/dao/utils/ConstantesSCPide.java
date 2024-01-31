@@ -9,9 +9,10 @@ public class ConstantesSCPide {
 	
 	public static final int NRO_VECES_REFRESH_CON_TOKEN_EXPIRADO = 100;
 	public static final String TOKEN_ACCESO_NEUTRO = "io";
+	public static final String TOKEN_ACCESO_INTERNO = "in";
+	public static final String TOKEN_ACCESO_EXTERNO = "out";
 	public static final String METHOD_CORTA_ULTIMA_BARRA_INVERTIDA = "PUT";
 	
-	public static final String TOKEN_ACCESO_INTERNO = "in";
 	public static final String TOKEN_OPERACION_SPLIT = "@";
 	public static final String AUD_JWT = "auditoriaJwt";
 	

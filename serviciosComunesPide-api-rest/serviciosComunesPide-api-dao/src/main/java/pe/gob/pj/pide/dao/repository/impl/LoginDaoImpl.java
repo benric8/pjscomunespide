@@ -56,6 +56,7 @@ public class LoginDaoImpl implements LoginDao, Serializable {
 				usuario.setIdPerfil(maeUsuario.getPerfil().getIdPerfil());
 				usuario.setDescripcionPerfil(maeUsuario.getPerfil().getDescripcion());
 				usuario.setNombrePerfil(maeUsuario.getPerfil().getNombre());
+				usuario.setCodigoRol(maeUsuario.getPerfil().getRol());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

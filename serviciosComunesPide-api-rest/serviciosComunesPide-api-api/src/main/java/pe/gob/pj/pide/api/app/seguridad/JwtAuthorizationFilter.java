@@ -56,7 +56,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
 		request.setAttribute(ConstantesSCPide.AUD_CUO, UtilsSCPide.obtenerCodigoUnico());
-		request.setAttribute(ConstantesSCPide.AUD_IP, !UtilsSCPide.isNullOrEmpty(request.getRemoteAddr()) ? request.getRemoteAddr() : request.getRemoteHost());
+		//request.setAttribute(ConstantesSCPide.AUD_IP, !UtilsSCPide.isNullOrEmpty(request.getRemoteAddr()) ? request.getRemoteAddr() : request.getRemoteHost());
 		UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
 		if (authentication == null) {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -74,14 +74,18 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	* @exception Captura excepcion generica
 	*/
 	private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-
+		String remoteIp = request.getRemoteAddr();
+		if(request.getRemoteAddr() == null) {
+			remoteIp = request.getRemoteHost();
+		}
 		String urlReq = request.getRequestURI();
 		String metodo = request.getMethod();
+		log.info("USERNAMEPASWORDAUTHENTICATION {} {}",urlReq,metodo);
 		if(metodo.equalsIgnoreCase(ConstantesSCPide.METHOD_CORTA_ULTIMA_BARRA_INVERTIDA)) {
 			urlReq = urlReq.substring(0, urlReq.lastIndexOf("/"));//corta el id que se manda en la url
 		}
 		String token = request.getHeader(SecurityConstants.TOKEN_HEADER);
-		String remoteIp = request.getAttribute(ConstantesSCPide.AUD_IP).toString();
+		//String remoteIp = request.getAttribute(ConstantesSCPide.AUD_IP).toString();
 		String cuo = request.getAttribute(ConstantesSCPide.AUD_CUO).toString();
 		byte[] signingKey = SecurityConstants.JWT_SECRET.getBytes();
 		if (!UtilsSCPide.isNullOrEmpty(token) && token.startsWith(SecurityConstants.TOKEN_PREFIX)) {
@@ -92,6 +96,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 				
 				String accesoBase = (String) parsedToken.getBody().get(ConstantesSCPide.CLAIM_ACCESO);
 				String username = parsedToken.getBody().getSubject();
+				String usuario = (String) parsedToken.getBody().get(ConstantesSCPide.CLAIM_USUARIO);
 				
 				@SuppressWarnings("unchecked")
 				List<String> roles = (List<String>) parsedToken.getBody().get(ConstantesSCPide.CLAIM_ROL);
@@ -100,7 +105,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 						.map(authority -> new SimpleGrantedAuthority((String) authority)).collect(Collectors.toList());
 				
 				String ipRemotaDeToken = parsedToken.getBody().get(ConstantesSCPide.CLAIM_IP).toString();
-				
+				Date limiteRefreshClaim = new Date(Long.parseLong(parsedToken.getBody().get(ConstantesSCPide.CLAIM_LIMIT).toString()));
 				int tiempoSegundosRefresh = ProjectProperties.getInstance().getSeguridadTiempoRefreshSegundos();
 				
 				Date ahora = new Date();
@@ -127,8 +132,16 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 						return null;
 					}
 				}
-
+				
 				if (!UtilsSCPide.isNullOrEmpty(username)) {
+					request.setAttribute(ConstantesSCPide.AUD_CUO, cuo);
+					if(urlReq.endsWith("refresh") || urlReq.endsWith("login")) {
+						request.setAttribute(ConstantesSCPide.REMOTE_IP, remoteIp);
+						request.setAttribute(ConstantesSCPide.CLAIM_LIMIT, limiteRefreshClaim);
+					} else if (urlReq.endsWith("buscarMarcacion")) {
+						request.setAttribute("usuario", usuario);
+					}
+					log.info("FINALIZAMOS LA UTHORIZACION {}");
 					return new UsernamePasswordAuthenticationToken(username, null, authorities);
 				}
 				

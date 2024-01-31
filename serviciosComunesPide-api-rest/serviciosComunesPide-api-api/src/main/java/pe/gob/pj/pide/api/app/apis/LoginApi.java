@@ -49,34 +49,36 @@ public class LoginApi implements Serializable {
 	private LoginService loginService;
 	
 	@RequestMapping(value = "/login", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE,  produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<GlobalResponseDTO> ingresoSistema(@RequestAttribute String cuo, @RequestAttribute String ipRemota, @Validated @RequestBody RequestLoginDTO login) {
+	public ResponseEntity<GlobalResponseDTO> ingresoSistema(@RequestAttribute String cuo, @RequestAttribute String ipRemota, @RequestAttribute Date limit, @Validated @RequestBody RequestLoginDTO login) {
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
 			
-			if(!UtilsSCPide.isNull(login.getAplicaCaptcha()).equals(ConstantesSCPide.STRING_S) || CaptchaUtils.validCaptcha(UtilsSCPide.isNull(login.getTokenCaptcha()), ipRemota, cuo)) {	
-				
-				res.setCodigo(ConstantesSCPide.C_200);
-				res.setDescripcion("Realizando login de acceso de usuario");
-				UsuarioDTO usuario = loginService.login(cuo, login.getUsuario(), login.getContrasenia());
-				if(usuario != null) {
-					String usuarioCompleto = login.getUsuario()+"-"+usuario.getUsuario();
-					String token  = getNewToken(login.getToken(), usuarioCompleto, "any", ipRemota, cuo);
-					if(UtilsSCPide.isNull(token).length() > 0) {
-						usuario.setToken(token);
-					} else {
-						res.setCodigo(ConstantesSCPide.C_401);
-						res.setDescripcion("Error no se pudo generar nuevo token");
+			logger.info("{} Inicio de método {}",cuo,"login");	
+			if(!UtilsSCPide.isNull(login.getAplicaCaptcha()).equals(ConstantesSCPide.STRING_S) || (UtilsSCPide.isNull(login.getAplicaCaptcha()).equals(ConstantesSCPide.STRING_S) && !UtilsSCPide.isNullOrEmpty(login.getTokenCaptcha()))) {	
+				if(!UtilsSCPide.isNull(login.getAplicaCaptcha()).equals(ConstantesSCPide.STRING_S) || CaptchaUtils.validCaptcha(login.getTokenCaptcha(), ipRemota, cuo)) {
+					UsuarioDTO usuario = loginService.login(cuo, login.getUsuario(), login.getContrasenia());
+					res.setCodigo("codigo");
+					res.setDescripcion("logueado");
+					if(usuario != null){
+						String usuarioCompleto = login.getUsuario();
+						usuarioCompleto = usuarioCompleto + "-" + usuario.getApellidosNombres();
+						String token  = getNewToken(login.getToken(), usuarioCompleto, usuario.getCodigoRol(), ipRemota, cuo,limit);
+						usuario.setCodigoRol("*********");
+						if(UtilsSCPide.isNull(token).length() > 0) {
+							usuario.setToken(token);
+							res.setData(usuario);
+						} else {
+							res.setCodigo(ConstantesSCPide.C_E002);
+							res.setDescripcion(ConstantesSCPide.X_E002);
+						}
 					}
-				} else {
+				}else {
 					res.setCodigo(ConstantesSCPide.C_404);
-					res.setDescripcion("Error no se recupero información de usuario");
+					res.setDescripcion("No se ha podido validar código captcha, por favor volver a intentarlo.");			
 				}
-				res.setData(usuario);
-				
 			}else {
-				res.setCodigo(ConstantesSCPide.C_404);
-				res.setDescripcion("No se ha podido validar código captcha, por favor volver a intentarlo.");			
-				logger.error("{} Error al autenticar usuario: {}", cuo , "No se ha podido validar código captcha, por favor volver a intentarlo.");			
+				res.setCodigo(ConstantesSCPide.C_400);
+				res.setDescripcion("tokenCaptcha("+ login.getTokenCaptcha() + "): El token captcha no puede ser nulo o vacio.");			
 			}
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
@@ -86,22 +88,24 @@ public class LoginApi implements Serializable {
 		return new ResponseEntity<GlobalResponseDTO>(res, HttpStatus.OK);
 	}
 	
-	public String getNewToken(String token, String usuario, String rol, String ipRemota,  String cuo){
+	public String getNewToken(String token, String usuario, String rol, String ipRemota,  String cuo, Date limit){
 		String newToken = "";
 		try {
 			byte[] signingKey = SecurityConstants.JWT_SECRET.getBytes();		
 			try {				
 				Jws<Claims> parsedToken = Jwts.parser().setSigningKey(signingKey).parseClaimsJws(token.replace("Bearer ", ""));
-//				List<String> roles = new ArrayList<String>();
-//				roles.add(rol);
-				@SuppressWarnings("unchecked")
-				List<String> roles = (List<String>) parsedToken.getBody().get("rol");
-				String ipRemotaToken = parsedToken.getBody().get("remoteIp").toString();
-				int total = (int) parsedToken.getBody().get("numero");
+				List<String> roles = new ArrayList<String>();
+				roles.add(rol);
+//				@SuppressWarnings("unchecked")
+//				List<String> roles = (List<String>) parsedToken.getBody().get(ConstantesSCPide.CLAIM_ROL);
+				String ipRemotaToken = parsedToken.getBody().get(ConstantesSCPide.CLAIM_IP).toString();
+				Date limiteRefreshClaim = new Date(Long.parseLong(parsedToken.getBody().get(ConstantesSCPide.CLAIM_LIMIT).toString()));
+				int total = (int) parsedToken.getBody().get(ConstantesSCPide.CLAIM_NUMERO);
 				String subject = parsedToken.getBody().getSubject();
 				
 				Integer tiempoToken = ConstantesSCPide.TOKEN_TIEMPO_PARA_EXPIRAR_SEGUNDOS * 1000 ;
-				if(ipRemota.equals(ipRemotaToken)) {
+				Date ahora = new Date();
+				if(limit.equals(limiteRefreshClaim) && ipRemota.equals(ipRemotaToken)) {
 					newToken = Jwts.builder()
 							.signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
 							.setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
@@ -109,9 +113,11 @@ public class LoginApi implements Serializable {
 							.setAudience(SecurityConstants.TOKEN_AUDIENCE)
 							.setSubject(subject)
 							.setExpiration(new Date(System.currentTimeMillis() + tiempoToken))
-							.claim("rol", roles)
-							.claim("usuario", usuario)
-							.claim("remoteIp", ipRemota)
+							.claim(ConstantesSCPide.CLAIM_ROL, roles)
+							.claim(ConstantesSCPide.CLAIM_USUARIO, usuario)
+							.claim(ConstantesSCPide.CLAIM_IP, ipRemota)
+							.claim(ConstantesSCPide.CLAIM_ACCESO, ConstantesSCPide.TOKEN_ACCESO_INTERNO)
+							.claim(ConstantesSCPide.CLAIM_LIMIT, UtilsSCPide.sumarRestarSegundos(ahora, ConstantesSCPide.TOKEN_TIEMPO_PARA_EXPIRAR_SEGUNDOS + ConstantesSCPide.TOKEN_TIEMPO_PARA_REFRESCAR_SEGUNDOS))
 							.claim("numero", total + 1)
 							.compact();
 				} 
@@ -119,10 +125,11 @@ public class LoginApi implements Serializable {
 				List<String> roles = new ArrayList<String>();
 				roles.add(rol);
 				String ipRemotaToken = e.getClaims().get("remoteIp").toString();
+				Date limiteRefreshClaim = new Date(Long.parseLong(e.getClaims().get(ConstantesSCPide.CLAIM_LIMIT).toString()));
 				int total = (int) e.getClaims().get("numero");
 				String subject = e.getClaims().getSubject();				
 				Integer tiempoToken = 900000;
-				if(ipRemota.equals(ipRemotaToken)) {
+				if(limit.equals(limiteRefreshClaim) && ipRemota.equals(ipRemotaToken)) {
 					newToken = Jwts.builder()
 							.signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
 							.setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
@@ -130,10 +137,10 @@ public class LoginApi implements Serializable {
 							.setAudience(SecurityConstants.TOKEN_AUDIENCE)
 							.setSubject(subject)
 							.setExpiration(new Date(System.currentTimeMillis() + tiempoToken))
-							.claim("rol", roles)
-							.claim("usuario", usuario)
-							.claim("remoteIp", ipRemota)
-							.claim("numero", total + 1)
+							.claim(ConstantesSCPide.CLAIM_ROL, roles)
+							.claim(ConstantesSCPide.CLAIM_USUARIO, usuario)
+							.claim(ConstantesSCPide.CLAIM_IP, ipRemota)
+							.claim(ConstantesSCPide.CLAIM_NUMERO, total + 1)
 							.compact();
 				} 
 			}			

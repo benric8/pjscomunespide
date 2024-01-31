@@ -1,5 +1,6 @@
 package pe.gob.pj.pide.service.impl;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -14,8 +15,12 @@ import pe.gob.pj.pide.dao.repository.SeguridadServiceDao;
 import pe.gob.pj.pide.service.SeguridadService;
 
 @Service("seguridadService")
-public class SeguridadServiceImpl implements SeguridadService{
+public class SeguridadServiceImpl implements SeguridadService, Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	@Autowired
 	private SeguridadServiceDao persistence;	
 	
