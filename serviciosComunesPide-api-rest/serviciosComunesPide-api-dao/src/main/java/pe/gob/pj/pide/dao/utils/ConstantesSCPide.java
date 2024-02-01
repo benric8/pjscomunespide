@@ -80,11 +80,13 @@ public class ConstantesSCPide {
 	public static final String C_403 = "403";
 	public static final String C_E003 = "E003";
 	public static final String C_E002 = "E002";
+	public static final String C_E001 = "E001";
 	public static final String STRING_S="S";
 	
 	public static final String X_EXITO = "La operación se realizo de manera exitosa.";
 	public static final String X_E003 = "Error al generar un nuevo token, el tiempo límite para refrescar el token enviado ha expirado.";
 	public static final String X_E002 = "Lo sentimos, hubo un problema al validar el token.";
+	public static final String X_E001 = "Los sentimos, la sesión ha expirado.";
 	//reniec
 	public static final String LETRA_VACIO="";
 	public static final String STRING_DOS= "2";

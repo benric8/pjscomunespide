@@ -91,12 +91,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 		if (!UtilsSCPide.isNullOrEmpty(token) && token.startsWith(SecurityConstants.TOKEN_PREFIX)) {
 			try {
 				String jwt = token.replace("Bearer ", "");
-				request.setAttribute(ConstantesSCPide.AUD_JWT, jwt);
+				//request.setAttribute(ConstantesSCPide.AUD_JWT, jwt);
 				Jws<Claims> parsedToken = Jwts.parser().setSigningKey(signingKey).parseClaimsJws(jwt);
 				
 				String accesoBase = (String) parsedToken.getBody().get(ConstantesSCPide.CLAIM_ACCESO);
 				String username = parsedToken.getBody().getSubject();
-				String usuario = (String) parsedToken.getBody().get(ConstantesSCPide.CLAIM_USUARIO);
+				
 				
 				@SuppressWarnings("unchecked")
 				List<String> roles = (List<String>) parsedToken.getBody().get(ConstantesSCPide.CLAIM_ROL);
@@ -125,12 +125,23 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 	logger.error(cuo+" hubo problema con la ip remoto o limite de expiración: "+token);
 					return null;
 				}
-				String accesoOperacion = !tieneAcceso.contains(ConstantesSCPide.TOKEN_OPERACION_SPLIT) ? ConstantesSCPide.TOKEN_ACCESO_INTERNO : tieneAcceso.split(ConstantesSCPide.TOKEN_OPERACION_SPLIT)[1];
-				if(!accesoOperacion.equalsIgnoreCase(ConstantesSCPide.TOKEN_ACCESO_NEUTRO)) {
-					if(!urlReq.endsWith("refresh") && !accesoOperacion.equalsIgnoreCase(accesoBase)) {
-						log.info("{} El token no tiene permiso [{}] para el método [{}]. ", cuo, ConstantesSCPide.TOKEN_ACCESO_INTERNO, urlReq);
-						return null;
-					}
+				
+				/*
+				 * String accesoOperacion =
+				 * !tieneAcceso.contains(ConstantesSCPide.TOKEN_OPERACION_SPLIT) ?
+				 * ConstantesSCPide.TOKEN_ACCESO_INTERNO :
+				 * tieneAcceso.split(ConstantesSCPide.TOKEN_OPERACION_SPLIT)[1];
+				 * if(!accesoOperacion.equalsIgnoreCase(ConstantesSCPide.TOKEN_ACCESO_NEUTRO)) {
+				 * if(!urlReq.endsWith("refresh") &&
+				 * !accesoOperacion.equalsIgnoreCase(accesoBase)) {
+				 * log.info("{} El token no tiene permiso [{}] para el método [{}]. ", cuo,
+				 * ConstantesSCPide.TOKEN_ACCESO_INTERNO, urlReq); return null; } }
+				 */
+				
+				if(!urlReq.endsWith("refresh") && ((!urlReq.endsWith("login") 
+						&& !accesoBase.equalsIgnoreCase(ConstantesSCPide.TOKEN_ACCESO_INTERNO)) || (urlReq.endsWith("login") && !accesoBase.equalsIgnoreCase(ConstantesSCPide.TOKEN_ACCESO_EXTERNO)))) {
+					log.info("{} El token no tiene permiso [{}] para el método [{}]. ", cuo, ConstantesSCPide.TOKEN_ACCESO_INTERNO, urlReq);
+					return null;
 				}
 				
 				if (!UtilsSCPide.isNullOrEmpty(username)) {
@@ -138,9 +149,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 					if(urlReq.endsWith("refresh") || urlReq.endsWith("login")) {
 						request.setAttribute(ConstantesSCPide.REMOTE_IP, remoteIp);
 						request.setAttribute(ConstantesSCPide.CLAIM_LIMIT, limiteRefreshClaim);
-					} else if (urlReq.endsWith("buscarMarcacion")) {
-						request.setAttribute("usuario", usuario);
-					}
+					} 
 					log.info("FINALIZAMOS LA UTHORIZACION {}");
 					return new UsernamePasswordAuthenticationToken(username, null, authorities);
 				}
@@ -150,11 +159,17 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 				String subject = exception.getClaims().getSubject();
 				int total = (int) exception.getClaims().get(ConstantesSCPide.CLAIM_NUMERO);			
 				
+				Date limiteRefreshClaim = new Date(Long.parseLong(exception.getClaims().get(ConstantesSCPide.CLAIM_LIMIT).toString()));
+				
+				
 				if (urlReq.endsWith("refresh") && remoteIp.equals(ipRemotaToken) && total<=ConstantesSCPide.NRO_VECES_REFRESH_CON_TOKEN_EXPIRADO) { // && !ahora.after(limiteRefresh)
 					List<SimpleGrantedAuthority> authorities = ((List<?>) exception.getClaims().get(ConstantesSCPide.CLAIM_ROL)).stream()
 							.map(authority -> new SimpleGrantedAuthority((String) authority))
 							.collect(Collectors.toList());
 					++total;
+					request.setAttribute(ConstantesSCPide.AUD_CUO, cuo);
+					request.setAttribute(ConstantesSCPide.REMOTE_IP, remoteIp);
+					request.setAttribute(ConstantesSCPide.CLAIM_LIMIT, limiteRefreshClaim);
 					return new UsernamePasswordAuthenticationToken(subject, null, authorities);
 				}
 				log.warn(cuo + "Request to parse expired JWT : {} failed : {}", token, exception.getMessage());

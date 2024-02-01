@@ -35,6 +35,7 @@ import pe.gob.pj.pide.dao.dto.RequestLoginDTO;
 import pe.gob.pj.pide.dao.dto.pide.UsuarioDTO;
 import pe.gob.pj.pide.dao.utils.CaptchaUtils;
 import pe.gob.pj.pide.dao.utils.ConstantesSCPide;
+import pe.gob.pj.pide.dao.utils.ProjectProperties;
 import pe.gob.pj.pide.dao.utils.SecurityConstants;
 import pe.gob.pj.pide.dao.utils.UtilsSCPide;
 import pe.gob.pj.pide.service.LoginService;
@@ -99,13 +100,16 @@ public class LoginApi implements Serializable {
 //				@SuppressWarnings("unchecked")
 //				List<String> roles = (List<String>) parsedToken.getBody().get(ConstantesSCPide.CLAIM_ROL);
 				String ipRemotaToken = parsedToken.getBody().get(ConstantesSCPide.CLAIM_IP).toString();
-				Date limiteRefreshClaim = new Date(Long.parseLong(parsedToken.getBody().get(ConstantesSCPide.CLAIM_LIMIT).toString()));
+				//Date limiteRefreshClaim = new Date(Long.parseLong(parsedToken.getBody().get(ConstantesSCPide.CLAIM_LIMIT).toString()));
 				int total = (int) parsedToken.getBody().get(ConstantesSCPide.CLAIM_NUMERO);
 				String subject = parsedToken.getBody().getSubject();
 				
-				Integer tiempoToken = ConstantesSCPide.TOKEN_TIEMPO_PARA_EXPIRAR_SEGUNDOS * 1000 ;
+				int tiempoSegundosExpira = ProjectProperties.getInstance().getSeguridadTiempoExpiraSegundos();
+				int tiempoSegundosRefresh = ProjectProperties.getInstance().getSeguridadTiempoRefreshSegundos();
+				
+				Integer tiempoToken = tiempoSegundosExpira * 1000 ;
 				Date ahora = new Date();
-				if(limit.equals(limiteRefreshClaim) && ipRemota.equals(ipRemotaToken)) {
+				if(ipRemota.equals(ipRemotaToken)) {
 					newToken = Jwts.builder()
 							.signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
 							.setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
@@ -117,7 +121,7 @@ public class LoginApi implements Serializable {
 							.claim(ConstantesSCPide.CLAIM_USUARIO, usuario)
 							.claim(ConstantesSCPide.CLAIM_IP, ipRemota)
 							.claim(ConstantesSCPide.CLAIM_ACCESO, ConstantesSCPide.TOKEN_ACCESO_INTERNO)
-							.claim(ConstantesSCPide.CLAIM_LIMIT, UtilsSCPide.sumarRestarSegundos(ahora, ConstantesSCPide.TOKEN_TIEMPO_PARA_EXPIRAR_SEGUNDOS + ConstantesSCPide.TOKEN_TIEMPO_PARA_REFRESCAR_SEGUNDOS))
+							.claim(ConstantesSCPide.CLAIM_LIMIT, UtilsSCPide.sumarRestarSegundos(ahora, tiempoSegundosExpira+ tiempoSegundosRefresh))
 							.claim("numero", total + 1)
 							.compact();
 				} 
@@ -125,11 +129,11 @@ public class LoginApi implements Serializable {
 				List<String> roles = new ArrayList<String>();
 				roles.add(rol);
 				String ipRemotaToken = e.getClaims().get("remoteIp").toString();
-				Date limiteRefreshClaim = new Date(Long.parseLong(e.getClaims().get(ConstantesSCPide.CLAIM_LIMIT).toString()));
+				//Date limiteRefreshClaim = new Date(Long.parseLong(e.getClaims().get(ConstantesSCPide.CLAIM_LIMIT).toString()));
 				int total = (int) e.getClaims().get("numero");
 				String subject = e.getClaims().getSubject();				
 				Integer tiempoToken = 900000;
-				if(limit.equals(limiteRefreshClaim) && ipRemota.equals(ipRemotaToken)) {
+				if(ipRemota.equals(ipRemotaToken)) {
 					newToken = Jwts.builder()
 							.signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
 							.setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)

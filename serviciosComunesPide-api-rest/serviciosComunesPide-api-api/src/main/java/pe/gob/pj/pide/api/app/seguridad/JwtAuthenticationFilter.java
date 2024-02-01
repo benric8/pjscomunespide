@@ -105,13 +105,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 				.claim(ConstantesSCPide.CLAIM_ROL, roles)
 				.claim(ConstantesSCPide.CLAIM_USUARIO, user.getUsername())
 				.claim(ConstantesSCPide.CLAIM_IP, request.getRemoteAddr())
-				.claim(ConstantesSCPide.CLAIM_ACCESO, ConstantesSCPide.TOKEN_ACCESO_NEUTRO)
+				.claim(ConstantesSCPide.CLAIM_ACCESO, ConstantesSCPide.TOKEN_ACCESO_EXTERNO)
 				.claim(ConstantesSCPide.CLAIM_LIMIT, UtilsSCPide.sumarRestarSegundos(ahora, tiempoSegundosExpira + tiempoSegundosRefresh))
 				.claim(ConstantesSCPide.CLAIM_NUMERO, 1)
 				.compact();
 		response.addHeader(SecurityConstants.TOKEN_HEADER, SecurityConstants.TOKEN_PREFIX + token);
 		response.setContentType("application/json");
-		response.getWriter().write("{\"token\":\""+token+"\",\"exps\":\""+tiempoSegundosExpira+"\",\"refs\":\""+tiempoSegundosRefresh+"\"}");
+		response.getWriter().write("{\"token\":\""+token+"\"}");
 	}
 	
 	/**
