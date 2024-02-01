@@ -22,6 +22,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.text.Normalizer;
 import java.util.regex.Pattern;
@@ -562,6 +563,17 @@ public class UtilsSCPide {
 		}
 
 		return firstInterface;
+	}
+	
+	public static String getClassMethodLineException(Exception e) {
+		return Optional.ofNullable(e.getStackTrace())
+                .filter(stackTrace -> stackTrace.length > 0)
+                .map(stackTrace -> stackTrace[0])
+                .map(element -> String.format("%s::%s::%d",
+                                               element.getClassName(),
+                                               element.getMethodName(),
+                                               element.getLineNumber()))
+                .orElse(ConstantesSCPide.X_CML_NOT_FOUND);
 	}
 
 }

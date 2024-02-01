@@ -34,5 +34,8 @@ public class RequestBusquedaSolicitudDTO implements Serializable{/**
 	
 	@JsonProperty("idEstadoSolicitud")
 	private int idEstadoSolicitud;
+	
+	@JsonProperty("numeroRuc")
+	private String numeroRuc;
 
 }

@@ -46,8 +46,8 @@ public class MaestrosApi implements Serializable{
 		try {
 			logger.info("{}Inicio de endpoint:{}",cuo,"listarComboEntidad");
 			List<PerfilDTO> lista = maestrosService.listarPerfilActivo(cuo);
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Se realizo búsqueda de entidades para combo.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(lista);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
@@ -63,8 +63,8 @@ public class MaestrosApi implements Serializable{
 		try {
 			logger.info("{}Inicio de endpoint:{}",cuo,"listarComboEntidad");
 			List<EntidadDTO> lista = maestrosService.listarEntidadActiva(cuo);
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Se realizo búsqueda de entidades para combo.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(lista);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
@@ -80,8 +80,8 @@ public class MaestrosApi implements Serializable{
 		try {
 			logger.info("{}Inicio de endpoint:{}",cuo,"completarComboEntidad");
 			List<EntidadDTO> lista = maestrosService.completarEntidadActiva(cuo, razonSocial);
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Se realizo autocompletar de entidades para combo.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(lista);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
@@ -97,8 +97,8 @@ public class MaestrosApi implements Serializable{
 		try {
 			logger.info("{}Inicio de endpoint:{}",cuo,"completarComboOperacion");
 			List<OperacionDTO> lista = maestrosService.completarOperacionActiva(cuo, operacion);
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Se realizo autocompletar de operaciones para combo.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(lista);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
@@ -114,8 +114,8 @@ public class MaestrosApi implements Serializable{
 		try {
 			logger.info("{}Inicio de endpoint:{}",cuo,"listarComboOperacion");
 			List<OperacionDTO> listaOperacion = maestrosService.listarOperacionActiva(cuo);
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Se realizo búsqueda de operaciones para combo.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(listaOperacion);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
@@ -131,8 +131,8 @@ public class MaestrosApi implements Serializable{
 		try {
 			logger.info("{}Inicio de endpoint:{}",cuo,"listarIpsEntidad");
 			List<IpEntidadDTO> lista = maestrosService.listarIpsEntidad(cuo, id);
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Se realizo listado de ips de entidad.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(lista);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
@@ -148,8 +148,8 @@ public class MaestrosApi implements Serializable{
 		try {
 			logger.info("{}Inicio de endpoint:{}",cuo,"listarEstadosSolicitud");
 			List<EstadoSolicitudDTO> lista = maestrosService.listarEstadosSolicitud(cuo, paraEvaluacion);
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Se realizo listado estados solicitud.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(lista);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
@@ -165,8 +165,8 @@ public class MaestrosApi implements Serializable{
 		try {
 			logger.info("{}Inicio de endpoint:{}",cuo,"listarTiposSolicitud");
 			List<TipoSolicitudDTO> lista = maestrosService.listarTiposSolicitud(cuo);
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Se realizo listado tipos solicitud.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(lista);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);

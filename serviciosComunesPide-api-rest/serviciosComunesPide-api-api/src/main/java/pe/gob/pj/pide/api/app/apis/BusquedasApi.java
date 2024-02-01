@@ -52,8 +52,8 @@ public class BusquedasApi implements Serializable{
 		try {
 			logger.info("{}Inicio de método:{}",cuo,"buscarPermiso");			
 			PaginationDTO pagination = serv.buscarAsignaccionAcceso(cuo, request, page, rows);
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Busqueda de asignación de accesos exitosa.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(pagination);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
@@ -70,8 +70,8 @@ public class BusquedasApi implements Serializable{
 		try {
 			logger.info("{}Inicio de método:{}",cuo,"buscarSolicitudes");			
 			PaginationDTO pagination = serv.buscarSolicitudCuota(cuo, request, page, rows);
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Busqueda de solicitu de cuota, exitosa.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(pagination);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
@@ -87,8 +87,8 @@ public class BusquedasApi implements Serializable{
 		try {
 			logger.info("{}Inicio de método:{}",cuo,"buscarSolicitudes");			
 			DetalleSolicitudDTO data = serv.buscarDetalleSolicitud(cuo, idSolicitud);
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Busqueda de detalled de solicitud, exitosa.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(data);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
@@ -105,8 +105,8 @@ public class BusquedasApi implements Serializable{
 		try {
 			logger.info("{}Inicio de método:{}",cuo,"buscarSolicitudes");			
 			ResponseHistorialCuotaDTO data = serv.historialCuota(cuo, idEntidad, idOperacion, anio, mes);
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Busqueda de solicitu de cuota, exitosa.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(data);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
@@ -122,8 +122,8 @@ public class BusquedasApi implements Serializable{
 		try {
 			logger.info("{}Inicio de método:{}",cuo,"validarDocumentoIdentidad");			
 			ResponseValidarDocumetoIdentidadDTO personaReniec = serv.validarDniReniec(cuo, request.getNroDocumento());
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Validación de dni en reniec.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(personaReniec);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
@@ -139,8 +139,8 @@ public class BusquedasApi implements Serializable{
 		try {
 			logger.info("{}Inicio de método:{}",cuo,"validarRuc");			
 			ResponseValidarRucDTO entidadSunat = serv.validarRucSunat(cuo, request.getRuc());
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Validación de ruc en sunat.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(entidadSunat);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);
