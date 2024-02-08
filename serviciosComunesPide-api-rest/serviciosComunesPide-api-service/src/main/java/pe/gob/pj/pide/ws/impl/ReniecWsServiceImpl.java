@@ -31,11 +31,12 @@ public class ReniecWsServiceImpl implements ReniecWsService {
 			beanParam.setEndpoint(ProjectProperties.getInstance().getEndPointReniec());
 			beanParam.setDniConsultante(ProjectProperties.getInstance().getDniConsultanteReniec());
 			beanParam.setTimeout(ProjectProperties.getInstance().getTimeOutReniec());
+			beanParam.setUsuario(ProjectProperties.getInstance().getUsuarioReniec());
 			
 			ConsultaReniec consultaReniecRequest = new ConsultaReniec();
 			consultaReniecRequest.setReqDni(preRegistro.getcNumeIdentidad());
 			consultaReniecRequest.setReqDniConsultante(beanParam.getDniConsultante());
-			consultaReniecRequest.setReqUsuario("SIJ");
+			consultaReniecRequest.setReqUsuario(beanParam.getUsuario());
 			consultaReniecRequest.setReqIp(UtilsSCPide.getIp());
 			consultaReniecRequest.setReqTrama(ConstantesSCPide.LETRA_VACIO);
 			consultaReniecRequest.setReqTipoConsulta(ConstantesSCPide.STRING_DOS);

@@ -226,6 +226,7 @@ public class BusquedaDaoImpl implements BusquedasDao, Serializable {
 		    TypedQuery<MovSolicitud> query = this.sf.getCurrentSession().createQuery(stringQuery.toString(), MovSolicitud.class);
 		    query.setParameter(MovSolicitud.P_FECHA_DESDE, filtros.get("fechaDesde"));
 		    query.setParameter(MovSolicitud.P_FECHA_HASTA, filtros.get("fechaHasta"));
+		    
 		    if(filtrosActivos.get("idSolicitud")) {
 		    	query.setParameter(MovSolicitud.P_ID_SOLICITUD, filtros.get("idSolicitud"));
 		    }
@@ -242,6 +243,17 @@ public class BusquedaDaoImpl implements BusquedasDao, Serializable {
 		    	query.setParameter(MovSolicitud.P_ID_ESTADO_SOLICITUD, filtros.get("idEstadoSolicitud"));
 		    }
 		    
+		    Long countResult = query.getResultStream().count();
+			int lastPage = (int) Math.floor(countResult/pageSize);
+			
+			page = (page <= lastPage ? page : lastPage);
+			
+			pagination.setTotalRecords(countResult.intValue());
+			pagination.setCurrentPage(page);
+			pagination.setLastPage(lastPage);
+		    
+		    query.setFirstResult(page*pageSize);
+			query.setMaxResults(pageSize);
 		    query.getResultStream().forEach(x -> {
 					lista.add(new SolicitudDTO(
 							x.getIdSolicitud(),

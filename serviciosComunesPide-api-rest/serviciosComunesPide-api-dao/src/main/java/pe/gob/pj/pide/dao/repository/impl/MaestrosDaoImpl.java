@@ -83,7 +83,7 @@ public class MaestrosDaoImpl implements MaestrosDao, Serializable{
 			TypedQuery<MaeOperacion> query = this.sf.getCurrentSession().createNamedQuery(MaeOperacion.Q_OPERACION_ACTIVO_BY_OPERACION, MaeOperacion.class);
 			query.setParameter(MaeOperacion.P_OPERACION, "%"+operacion.toUpperCase().trim()+"%");
 			query.getResultStream().forEach(x -> {
-				lista.add(new OperacionDTO(x.getIdOperacion(), x.getNombre(), x.getDescripcion(), x.getEndpoint(), x.getCuotaDefecto(), x.getActivo()));
+				lista.add(new OperacionDTO(x.getIdOperacion(), x.getNombre()));
 			});
 		} catch (Exception e) {
 			logger.error("{}Error:{}",cuo,e.getMessage());
@@ -93,13 +93,30 @@ public class MaestrosDaoImpl implements MaestrosDao, Serializable{
 	}
 
 	@Override
+	public List<OperacionDTO> listarOperacion(String cuo) throws Exception{
+		List<OperacionDTO> lista = new ArrayList<>();
+		try {
+			logger.info("{}Inicio de método:{}",cuo,"listarOperacion");
+			TypedQuery<MaeOperacion> query = this.sf.getCurrentSession().createNamedQuery(MaeOperacion.Q_OPERACION, MaeOperacion.class);
+			query.getResultStream().forEach(x -> {
+				lista.add(new OperacionDTO(x.getIdOperacion(), x.getNombre(), x.getOperacion(),x.getDescripcion(), x.getEndpoint(), x.getCuotaDefecto(),
+						x.getRequiereAprobacionAcceso(),x.getRequiereAprobacionCuota(),x.getRequiereAprobacionIps(),x.getRequiereAprobacionEstado(), x.getActivo()));
+			});
+		} catch (Exception e) {
+			logger.error("{}Error:{}",cuo,e.getMessage());
+			e.printStackTrace();
+		}
+		return lista;
+	}
+	
+	@Override
 	public List<OperacionDTO> listarOperacionActiva(String cuo) throws Exception{
 		List<OperacionDTO> lista = new ArrayList<>();
 		try {
 			logger.info("{}Inicio de método:{}",cuo,"listarOperacionActiva");
 			TypedQuery<MaeOperacion> query = this.sf.getCurrentSession().createNamedQuery(MaeOperacion.Q_OPERACION_BY_ACTIVO, MaeOperacion.class);
 			query.getResultStream().forEach(x -> {
-				lista.add(new OperacionDTO(x.getIdOperacion(), x.getNombre(), x.getDescripcion(), x.getEndpoint(), x.getCuotaDefecto(), x.getActivo()));
+				lista.add(new OperacionDTO(x.getIdOperacion(), x.getNombre()));
 			});
 		} catch (Exception e) {
 			logger.error("{}Error:{}",cuo,e.getMessage());

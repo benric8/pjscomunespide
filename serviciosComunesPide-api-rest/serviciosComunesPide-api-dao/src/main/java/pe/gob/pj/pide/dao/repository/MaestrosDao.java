@@ -12,6 +12,7 @@ import pe.gob.pj.pide.dao.dto.pide.TipoSolicitudDTO;
 public interface MaestrosDao {
 	public List<EntidadDTO> listarEntidadActiva(String cuo) throws Exception;
 	public List<EntidadDTO> completarEntidadActiva(String cuo, String razonSocial) throws Exception;
+	public List<OperacionDTO> listarOperacion(String cuo) throws Exception;
 	public List<OperacionDTO> listarOperacionActiva(String cuo) throws Exception;
 	public List<OperacionDTO> completarOperacionActiva(String cuo, String operacion) throws Exception;
 	public List<IpEntidadDTO> listarIpsEntidad(String cuo, Integer idEntidad) throws Exception;

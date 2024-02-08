@@ -49,6 +49,10 @@ public class PropertyConfig implements Serializable{
 
 	@Value("${pe.gob.pj.scpide.servicio.wsreniec.dniconsultante:null}")
 	private String DniConsultanteReniec;
+	
+	@Value("${pe.gob.pj.scpide.servicio.wsreniec.usuario:null}")
+	private String usuarioReniec;
+	
 
 	// #PIDE
 	@Value("${pe.gob.pj.scpide.servicio.wspide.endpoint:null}")

@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 import pe.gob.pj.pide.dao.dto.seguridad.RolDTO;
 import pe.gob.pj.pide.dao.dto.seguridad.UsuarioDTO;
 import pe.gob.pj.pide.dao.entity.security.MaeRol;
@@ -25,7 +25,7 @@ import pe.gob.pj.pide.dao.utils.EncryptUtils;
 import pe.gob.pj.pide.dao.utils.ProjectProperties;
 import pe.gob.pj.pide.dao.utils.UtilsSCPide;
 
-@Slf4j
+@Log4j2
 @Component("seguridadServiceDao")
 public class SeguridadServiceDaoImpl implements SeguridadServiceDao {
 	

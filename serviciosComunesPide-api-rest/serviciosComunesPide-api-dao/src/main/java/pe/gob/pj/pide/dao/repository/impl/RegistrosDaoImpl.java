@@ -583,7 +583,7 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 		MaeOperacion opera;
 		TypedQuery<MaeOperacion> query = this.sf.getCurrentSession().createNamedQuery(MaeOperacion.Q_OPERACION_BY_ENDPOINT,
 				MaeOperacion.class);
-		query.setParameter(MaeOperacion.P_ENDPOINT_OPERACION, operacion.getEndpoint());
+		query.setParameter(MaeOperacion.P_ENDPOINT_OPERACION, operacion.getEndPoint());
 		opera = query.getResultStream().findFirst().orElse(new MaeOperacion());
 		if (opera.getIdOperacion()!= null && opera.getIdOperacion() > 0) {
 			logger.warn("{} EL endpoint ingresado ya se encuentra registrado.", cuo);
@@ -592,7 +592,7 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 			opera.setNombre(operacion.getNombre());
 			opera.setOperacion(operacion.getOperacion());
 			opera.setDescripcion(operacion.getDescripcion());
-			opera.setEndpoint(operacion.getEndpoint());
+			opera.setEndpoint(operacion.getEndPoint());
 			opera.setCuotaDefecto(operacion.getCuotaDefecto());
 			opera.setRequiereAprobacionAcceso(operacion.getRequiereAprobacionAcceso());
 			opera.setRequiereAprobacionCuota(operacion.getRequiereAprobacionCuota());
@@ -633,9 +633,10 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 		
 		try {
 
+			operacionPrevia.setNombre(operacion.getNombre());
 			operacionPrevia.setOperacion(operacion.getOperacion());
 			operacionPrevia.setDescripcion(operacion.getDescripcion());
-			operacionPrevia.setEndpoint(operacion.getEndpoint());
+			operacionPrevia.setEndpoint(operacion.getEndPoint());
 			operacionPrevia.setCuotaDefecto(operacion.getCuotaDefecto());
 			operacionPrevia.setRequiereAprobacionAcceso(operacion.getRequiereAprobacionAcceso());
 			operacionPrevia.setRequiereAprobacionCuota(operacion.getRequiereAprobacionCuota());

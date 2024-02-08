@@ -58,8 +58,8 @@ public class LoginApi implements Serializable {
 			if(!UtilsSCPide.isNull(login.getAplicaCaptcha()).equals(ConstantesSCPide.STRING_S) || (UtilsSCPide.isNull(login.getAplicaCaptcha()).equals(ConstantesSCPide.STRING_S) && !UtilsSCPide.isNullOrEmpty(login.getTokenCaptcha()))) {	
 				if(!UtilsSCPide.isNull(login.getAplicaCaptcha()).equals(ConstantesSCPide.STRING_S) || CaptchaUtils.validCaptcha(login.getTokenCaptcha(), ipRemota, cuo)) {
 					UsuarioDTO usuario = loginService.login(cuo, login.getUsuario(), login.getContrasenia());
-					res.setCodigo("codigo");
-					res.setDescripcion("logueado");
+					res.setCodigo(ConstantesSCPide.C_EXITO);
+					res.setDescripcion(ConstantesSCPide.X_EXITO);
 					if(usuario != null){
 						String usuarioCompleto = login.getUsuario();
 						usuarioCompleto = usuarioCompleto + "-" + usuario.getApellidosNombres();
@@ -110,6 +110,7 @@ public class LoginApi implements Serializable {
 				Integer tiempoToken = tiempoSegundosExpira * 1000 ;
 				Date ahora = new Date();
 				if(ipRemota.equals(ipRemotaToken)) {
+					logger.info("comparamos si las ip son iguales ");
 					newToken = Jwts.builder()
 							.signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
 							.setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
@@ -126,6 +127,7 @@ public class LoginApi implements Serializable {
 							.compact();
 				} 
 			} catch (ExpiredJwtException e) {
+				logger.info("ingresamos al error handler {}",e.getCause());
 				List<String> roles = new ArrayList<String>();
 				roles.add(rol);
 				String ipRemotaToken = e.getClaims().get("remoteIp").toString();

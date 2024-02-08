@@ -6,14 +6,11 @@ import java.io.Serializable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-
 import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
-import pe.gob.pj.pide.dao.utils.ConstantesSCPide;
 
 @Data
 public class RequestOperacionDTO implements Serializable{
@@ -41,12 +38,12 @@ public class RequestOperacionDTO implements Serializable{
 	@JsonProperty("descripcion")
 	private String descripcion;
 	
-	@Pattern(regexp = ConstantesSCPide.PATTERN_ENDPOINT, message="El endpoint no tiene el formato adecuado")
+	//@Pattern(regexp = ConstantesSCPide.PATTERN_ENDPOINT, message="El endpoint no tiene el formato adecuado")
 	@NotNull(message = "El endpoint no puede ser null")
-	@Length(min=0, max=300, message = "El endpoint tiene una longitud no permitida [min=0,max=300]")
+	@Length(min=0, max=400, message = "El endpoint tiene una longitud no permitida [min=0,max=300]")
 	@NotBlank(message = "El endpoint tiene un valor incorrecto")
-	@JsonProperty("endpoint")
-	private String endpoint;
+	@JsonProperty("endPoint")
+	private String endPoint;
 	
 	@Min(value = 20, message = "La cuotaDefecto no puede ser menor a 20.")
 	@NotNull(message = "La cuotaDefecto no puede ser null")

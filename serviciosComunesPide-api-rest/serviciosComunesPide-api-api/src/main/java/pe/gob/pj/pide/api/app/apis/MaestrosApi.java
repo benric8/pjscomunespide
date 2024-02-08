@@ -176,4 +176,21 @@ public class MaestrosApi implements Serializable{
 		return new ResponseEntity<GlobalResponseDTO>(res, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/listarOperacion", method = RequestMethod.GET, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<GlobalResponseDTO> listarOperacion(@RequestAttribute String cuo) {
+		GlobalResponseDTO res = new GlobalResponseDTO();
+		try {
+			logger.info("{}Inicio de endpoint:{}",cuo,"listarOperacion");
+			List<OperacionDTO> listaOperacion = maestrosService.listarOperacion(cuo);
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
+			res.setData(listaOperacion);
+		} catch (Exception e) {
+			res.setCodigo(ConstantesSCPide.C_500);
+			res.setDescripcion(UtilsSCPide.isNull(e.getCause()).concat(e.getMessage()));			
+			logger.error("{} Error en listarComboOperacion: {}", cuo , res.getDescripcion());
+		}
+		return new ResponseEntity<GlobalResponseDTO>(res, HttpStatus.OK);
+	}
+	
 }

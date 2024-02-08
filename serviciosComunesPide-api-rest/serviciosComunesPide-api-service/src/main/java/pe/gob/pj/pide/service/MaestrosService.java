@@ -34,6 +34,14 @@ public interface MaestrosService {
 	/**
 	 * 
 	 * @param cuo
+	 * @return Lista de todas las operaciones
+	 * @throws Exception
+	 */
+	public List<OperacionDTO> listarOperacion(String cuo) throws Exception;
+
+	/**
+	 * 
+	 * @param cuo
 	 * @return Lista de operaciones activas
 	 * @throws Exception
 	 */
