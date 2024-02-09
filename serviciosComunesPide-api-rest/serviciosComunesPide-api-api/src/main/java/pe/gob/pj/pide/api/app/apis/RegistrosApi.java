@@ -44,8 +44,8 @@ public class RegistrosApi implements Serializable{
 	public ResponseEntity<GlobalResponseDTO> registrarEntidad(@RequestAttribute String cuo, @Validated @RequestBody RequestRegistrarEntidadDTO request) {
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Realizando registro de entidad.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			boolean rpta = serv.registrarEntidad(cuo, request);
 			if(rpta) {
 				res.setDescripcion("Registro de entidad, exitoso.");
@@ -65,8 +65,8 @@ public class RegistrosApi implements Serializable{
 	public ResponseEntity<GlobalResponseDTO> registrarIpEntidad(@RequestAttribute String cuo, @Validated @RequestBody RequestRegistrarIpEntidadDTO request) {
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Realizando Registro/Edición de ip entidad.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			boolean rpta = serv.registrarIpEntidad(cuo, request);
 			if(rpta) {
 				res.setDescripcion("Registro/Edición de ip entidad, exitoso.");
@@ -86,8 +86,8 @@ public class RegistrosApi implements Serializable{
 	public ResponseEntity<GlobalResponseDTO> registrarSolicitudCuota(@RequestAttribute String cuo, @Validated @RequestBody RequestRegistrarSolicitudCuotaDTO request) {
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Realizando registro de solicitud de cuota.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			SolicitudDTO rpta = serv.registrarSolicitudCuota(cuo, request);
 			res.setData(rpta);
 		} catch (Exception e) {
@@ -102,8 +102,8 @@ public class RegistrosApi implements Serializable{
 	public ResponseEntity<GlobalResponseDTO> evaluarSolicitudCuota(@RequestAttribute String cuo, @Validated @RequestBody RequestEvaluarSolicitudCuotaDTO request) {
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Realizando evaluación de solicitud de cuota.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			boolean rpta = serv.evaluarSolicitudCuota(cuo, request);
 			if(rpta) {
 				res.setDescripcion("Evaluación de solicitud, exitoso.");
@@ -123,8 +123,8 @@ public class RegistrosApi implements Serializable{
 	public ResponseEntity<GlobalResponseDTO> modificarPermiso(@RequestAttribute String cuo, @Validated @RequestBody RequestModificarPermisoDTO request) {
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Realizando modificación de permiso.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			boolean rpta = serv.modificarPermiso(cuo, request);
 			if(rpta) {
 				res.setDescripcion("Modificación de permiso, exitoso.");
@@ -144,8 +144,8 @@ public class RegistrosApi implements Serializable{
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
 			logger.info("{}Inicio de endpoint:{}",cuo,"registrarOperacion");
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Realizando registro de operacion.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			boolean rpta = serv.registrarOperacion(cuo, request);
 			if(rpta) {
 				res.setDescripcion("Registro de operacion, exitoso.");
@@ -166,8 +166,8 @@ public class RegistrosApi implements Serializable{
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
 			logger.info("{}Inicio de endpoint:{}",cuo,"modificarOperacion");
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Realizando modificación de la Operacion.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			boolean rpta = serv.modificarOperacion(cuo, request,idOperacion);
 			if(rpta) {
 				res.setDescripcion("Modificación de Operacion, exitoso.");

@@ -77,6 +77,7 @@ public class BusquedasServiceImpl implements BusquedasService, Serializable {
 		filtros.put("idEntidad", request.getIdEntidad());
 		filtros.put("idOperacion", request.getIdOperacion());
 		filtros.put("idEstadoSolicitud", request.getIdEstadoSolicitud());
+		filtros.put("numeroRuc", request.getNumeroRuc());
 		filtros.put("fechaDesde", request.getFechaDesde());
 		filtros.put("fechaHasta", UtilsSCPide.sumarRestarDias(request.getFechaHasta(), 1));
 		if(page!=null && pageSize!=null) {

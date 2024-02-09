@@ -5,23 +5,18 @@ public class ConstantesSCPide {
 	public static final int DEFAULT_PAGINATION_PAGE_SIZE = 10;
 	
 	public static final int TOKEN_TIEMPO_PARA_EXPIRAR_SEGUNDOS = 300;
-	public static final int TOKEN_TIEMPO_PARA_REFRESCAR_SEGUNDOS = 180;
-	
 	public static final int NRO_VECES_REFRESH_CON_TOKEN_EXPIRADO = 100;
-	public static final String TOKEN_ACCESO_NEUTRO = "io";
-	public static final String TOKEN_ACCESO_INTERNO = "in";
-	public static final String TOKEN_ACCESO_EXTERNO = "out";
 	public static final String METHOD_CORTA_ULTIMA_BARRA_INVERTIDA = "PUT";
 	
-	public static final String TOKEN_OPERACION_SPLIT = "@";
-	public static final String AUD_JWT = "auditoriaJwt";
-	
-	public static final String AUD_IP = "auditoriaIp";
 	public static final String VERSION = "1.0.0";
 
 	public static final String ESQUEMA_SEGURIDAD = "seguridad";
 	public static final String ESQUEMA_PIDE = "pide";
 
+	
+	public static final String TOKEN_ACCESO_INTERNO = "in";
+	public static final String TOKEN_ACCESO_EXTERNO = "out";
+	
 	public final static String PATTERN_NUMBER = "[0-9]+";
 	public static final String PATTERN_IP = "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.([01]?\\d\\d?|2[0-4]\\d|25[0-5])$";
 	public static final String PATTERN_MAC = "([0-9A-F]{2}[:-]){5}([0-9A-F]{2})";
@@ -68,25 +63,47 @@ public class ConstantesSCPide {
 	public static final String CLAIM_IP = "remoteIp";
 	public static final String CLAIM_NUMERO = "numero";
 	public static final String CLAIM_INIPAGE = "page_i";
-	public static final String CLAIM_ACCESO = "log_";
 	public static final String CLAIM_LIMIT= "limit";
+	public static final String CLAIM_ACCESO = "log_";
 
-	public static final String C_EXITO  = "0000";
 	public static final String C_500 = "500";
 	public static final String C_404 = "404";
-	public static final String C_200 = "200";
+	
 	public static final String C_400 = "400";
 	public static final String C_401 = "401";
 	public static final String C_403 = "403";
-	public static final String C_E003 = "E003";
-	public static final String C_E002 = "E002";
+	
+	public static final String C_ERROR = "E";
+	public static final String C_EXITO  = "0000";
+	public static final String C_0001 = "0001";
+	public static final String C_E000 = "E000";
 	public static final String C_E001 = "E001";
-	public static final String STRING_S="S";
+	public static final String C_E002 = "E002";
+	public static final String C_E003 = "E003";
+	public static final String C_E004 = "E004";
+	public static final String C_E005 = "E005";
+	public static final String C_E013 = "E013";
+	public static final String C_E014 = "E014";
+	public static final String C_E015 = "E015";
+
+	public static final String X_TRAZA_LOG ="TRAZA-LOG";	
+	public static final String X_CML_NOT_FOUND = "ERROR: No se puede identificar las CLASE-METODO-LINEA.";
 	
 	public static final String X_EXITO = "La operación se realizo de manera exitosa.";
-	public static final String X_E003 = "Error al generar un nuevo token, el tiempo límite para refrescar el token enviado ha expirado.";
+	public static final String X_0001 = "Datos no encontrados al ";
+	public static final String X_E000 = " - Error inesperado.";
+	public static final String X_E001 = "Lo sentimos, la sesión ha expirado.";
 	public static final String X_E002 = "Lo sentimos, hubo un problema al validar el token.";
-	public static final String X_E001 = "Los sentimos, la sesión ha expirado.";
+	public static final String X_E003 = "Error al generar un nuevo token, el tiempo límite para refrescar el token enviado ha expirado.";
+	public static final String X_ERROR = "Error al ";
+	public static final String X_E004 = " - Problemas en la ejecución del SP: ";
+	public static final String X_E005 = " - No se estableció conexión con la BD PJ Seguridad.";
+	public static final String X_E013 = " - Problemas con el consumo del endpoint: ";
+	public static final String X_E014 = " - El token captcha es nulo o no es válido. ";
+	public static final String X_E015 = " - problemas en la ejecución de la sentencia JPA. ";
+	
+	public static final String STRING_S="S";
+	
 	//reniec
 	public static final String LETRA_VACIO="";
 	public static final String STRING_DOS= "2";

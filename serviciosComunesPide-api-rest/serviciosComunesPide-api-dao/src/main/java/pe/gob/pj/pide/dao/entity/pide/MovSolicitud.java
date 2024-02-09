@@ -89,6 +89,7 @@ public class MovSolicitud extends Auditoria implements Serializable {
 	public static final String P_FECHA_HASTA = "fechaHasta";
 	public static final String P_TIPO_IMPACTO = "tipoImpacto";
 	public static final String P_ESTADO_NOMBRE = "estadoNombre";
+	public static final String P_RUC = "nroRuc";
 	
 	@SequenceGenerator(name = "GENERATOR_MOV_SOLICITUD", schema = ConstantesSCPide.ESQUEMA_PIDE, sequenceName = "USEQ_MOV_SOLICITUD", allocationSize = 1)
 	@GeneratedValue(generator = "GENERATOR_MOV_SOLICITUD", strategy = GenerationType.SEQUENCE)

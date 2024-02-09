@@ -58,8 +58,8 @@ public class LoginApi implements Serializable {
 			if(!UtilsSCPide.isNull(login.getAplicaCaptcha()).equals(ConstantesSCPide.STRING_S) || (UtilsSCPide.isNull(login.getAplicaCaptcha()).equals(ConstantesSCPide.STRING_S) && !UtilsSCPide.isNullOrEmpty(login.getTokenCaptcha()))) {	
 				if(!UtilsSCPide.isNull(login.getAplicaCaptcha()).equals(ConstantesSCPide.STRING_S) || CaptchaUtils.validCaptcha(login.getTokenCaptcha(), ipRemota, cuo)) {
 					UsuarioDTO usuario = loginService.login(cuo, login.getUsuario(), login.getContrasenia());
-					res.setCodigo("codigo");
-					res.setDescripcion("logueado");
+					res.setCodigo(ConstantesSCPide.C_EXITO);
+					res.setDescripcion(ConstantesSCPide.X_EXITO);
 					if(usuario != null){
 						String usuarioCompleto = login.getUsuario();
 						usuarioCompleto = usuarioCompleto + "-" + usuario.getApellidosNombres();
@@ -74,11 +74,11 @@ public class LoginApi implements Serializable {
 						}
 					}
 				}else {
-					res.setCodigo(ConstantesSCPide.C_404);
-					res.setDescripcion("No se ha podido validar código captcha, por favor volver a intentarlo.");			
+					res.setCodigo(ConstantesSCPide.C_E014);
+					res.setDescripcion(ConstantesSCPide.X_E014);			
 				}
 			}else {
-				res.setCodigo(ConstantesSCPide.C_400);
+				res.setCodigo(ConstantesSCPide.C_E014);
 				res.setDescripcion("tokenCaptcha("+ login.getTokenCaptcha() + "): El token captcha no puede ser nulo o vacio.");			
 			}
 		} catch (Exception e) {
@@ -110,6 +110,7 @@ public class LoginApi implements Serializable {
 				Integer tiempoToken = tiempoSegundosExpira * 1000 ;
 				Date ahora = new Date();
 				if(ipRemota.equals(ipRemotaToken)) {
+					logger.info("comparamos si las ip son iguales ");
 					newToken = Jwts.builder()
 							.signWith(Keys.hmacShaKeyFor(signingKey), SignatureAlgorithm.HS512)
 							.setHeaderParam("typ", SecurityConstants.TOKEN_TYPE)
@@ -126,6 +127,7 @@ public class LoginApi implements Serializable {
 							.compact();
 				} 
 			} catch (ExpiredJwtException e) {
+				logger.info("ingresamos al error handler {}",e.getCause());
 				List<String> roles = new ArrayList<String>();
 				roles.add(rol);
 				String ipRemotaToken = e.getClaims().get("remoteIp").toString();
@@ -159,7 +161,7 @@ public class LoginApi implements Serializable {
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
 			if(!request.getClaveActual().equalsIgnoreCase(request.getClaveNueva())) {
-				res.setCodigo(ConstantesSCPide.C_200);
+				res.setCodigo(ConstantesSCPide.C_EXITO);
 				boolean rpta = loginService.cambiarClave(cuo, request.getUsuario(), request.getClaveActual(), request.getClaveNueva());
 				if(rpta) {
 					res.setDescripcion("Cambio de contraseña, exitoso.");
@@ -184,7 +186,7 @@ public class LoginApi implements Serializable {
 	public ResponseEntity<GlobalResponseDTO> restablecerPassword(@RequestAttribute String cuo, @RequestParam(name = "idUsuario") int idUsuario) {
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
-			res.setCodigo(ConstantesSCPide.C_200);
+			res.setCodigo(ConstantesSCPide.C_EXITO);
 			boolean rpta = loginService.restablecerClave(cuo, idUsuario);
 			if(rpta) {
 				res.setDescripcion("Se restablecio la contraseña de manera exitoso.");
@@ -204,8 +206,8 @@ public class LoginApi implements Serializable {
 	public ResponseEntity<GlobalResponseDTO> registrarUsuario(@RequestAttribute String cuo, @Validated @RequestBody UsuarioDTO request) {
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Realizando registro de usuario.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			boolean rpta = loginService.registrarUsuario(cuo, request);
 			if(rpta) {
 				res.setDescripcion("Registro de usuario, exitoso.");
@@ -225,8 +227,8 @@ public class LoginApi implements Serializable {
 	public ResponseEntity<GlobalResponseDTO> modificarUsuario(@RequestAttribute String cuo, @Validated @RequestBody UsuarioDTO request) {
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Realizando modificación de usuario.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			boolean rpta = loginService.modificarUsuario(cuo, request);
 			if(rpta) {
 				res.setDescripcion("Modificación de usuario, exitoso.");
@@ -249,8 +251,8 @@ public class LoginApi implements Serializable {
 		try {
 			logger.info("{}Inicio de método:{}",cuo,"buscarPermiso");			
 			PaginationDTO pagination = loginService.buscarUsuario(cuo, request, page, rows);
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Busqueda de asignación de accesos exitosa.");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			res.setData(pagination);
 		} catch (Exception e) {
 			res.setCodigo(ConstantesSCPide.C_500);

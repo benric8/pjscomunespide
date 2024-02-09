@@ -27,10 +27,10 @@ public class PropertyConfig implements Serializable{
 	@Value("${configuracion.seguridad.idaplicativo:0}")
 	private Integer seguridadIdAplicativo;
 	
-	@Value("${configuracion.seguridad.authenticate.token.tiempo.expira.segundos:300}")
+	@Value("${configuracion.seguridad.authenticate.token.tiempo.expira.segundos:600}")
 	private Integer seguridadTiempoExpiraSegundos;
 	
-	@Value("${configuracion.seguridad.authenticate.token.tiempo.refresh.segundos:180}")
+	@Value("${configuracion.seguridad.authenticate.token.tiempo.refresh.segundos:300}")
 	private Integer seguridadTiempoRefreshSegundos;
 	
 	// #CAPTCHA
@@ -49,6 +49,10 @@ public class PropertyConfig implements Serializable{
 
 	@Value("${pe.gob.pj.scpide.servicio.wsreniec.dniconsultante:null}")
 	private String DniConsultanteReniec;
+	
+	@Value("${pe.gob.pj.scpide.servicio.wsreniec.usuario:null}")
+	private String usuarioReniec;
+	
 
 	// #PIDE
 	@Value("${pe.gob.pj.scpide.servicio.wspide.endpoint:null}")

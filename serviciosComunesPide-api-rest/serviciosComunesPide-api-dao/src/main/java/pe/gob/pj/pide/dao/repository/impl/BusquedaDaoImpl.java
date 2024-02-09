@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -174,68 +175,103 @@ public class BusquedaDaoImpl implements BusquedasDao, Serializable {
 			throws Exception {
 		PaginationDTO pagination = new PaginationDTO();
 		List<SolicitudDTO> lista = new ArrayList<>();
-		
+		Map<String, Boolean> filtrosActivos = new HashMap<>();
+		filtrosActivos.put("idSolicitud", false);
+		filtrosActivos.put("idEntidad", false);
+		filtrosActivos.put("numeroRuc", false);
+		filtrosActivos.put("idOperacion", false);
+		filtrosActivos.put("idEstadoSolicitud", false);
+		filtrosActivos.put("fechaDesde", false);
+		filtrosActivos.put("fechaHasta", false);
 		pagination.setPageSize(pageSize);
 		pagination.setFirstPage(0);
 		try {
 			logger.info("{} Inicio de :{}", cuo, "buscarSolicitudCuota");
+			StringBuilder stringQuery = new StringBuilder("SELECT mbc FROM MovSolicitud mbc");
+			stringQuery.append(" JOIN mbc.entidad me");
+			stringQuery.append(" LEFT JOIN mbc.operacion mo");
+			stringQuery.append(" JOIN mbc.tipoSolicitud mts");
+			stringQuery.append(" JOIN mbc.estadoSolicitud mes");
+			stringQuery.append(" WHERE mbc.fechaSolicito BETWEEN : "+MovSolicitud.P_FECHA_DESDE +" AND : "+MovSolicitud.P_FECHA_HASTA);
 			if (!UtilsSCPide.isNullOrEmpty(filtros.get("idSolicitud")) && Integer.parseInt(String.valueOf(filtros.get("idSolicitud"))) > 0) {
-				Filter filter1 = this.sf.getCurrentSession().enableFilter(MovSolicitud.F_ID_SOLICITUD);
-				filter1.setParameter(MovSolicitud.P_ID_SOLICITUD, filtros.get("idSolicitud"));
+				stringQuery.append(" AND mbc.idSolicitud =: "+MovSolicitud.P_ID_SOLICITUD);
+				filtrosActivos.put("idSolicitud",true);
+				//
+				
 				logger.info("{} Filtro "+MovSolicitud.P_ID_SOLICITUD+" : {}", cuo, filtros.get("idSolicitud"));
 			}
 			if (!UtilsSCPide.isNullOrEmpty(filtros.get("idEntidad")) && Integer.parseInt(String.valueOf(filtros.get("idEntidad"))) > 0) {
-				Filter filter1 = this.sf.getCurrentSession().enableFilter(MovSolicitud.F_ID_ENTIDAD);
-				filter1.setParameter(MovSolicitud.P_ID_ENTIDAD, filtros.get("idEntidad"));
+				stringQuery.append(" AND me.idEntidad=: "+MovSolicitud.P_ID_ENTIDAD);
+				filtrosActivos.put("idEntidad",true);
 				logger.info("{} Filtro "+MovSolicitud.P_ID_ENTIDAD+" : {}", cuo, filtros.get("idEntidad"));
 			}
+			if (!UtilsSCPide.isNullOrEmpty(filtros.get("numeroRuc"))) {
+				stringQuery.append(" AND me.ruc=: "+MovSolicitud.P_RUC);
+				filtrosActivos.put("numeroRuc",true);
+				logger.info("{} Filtro "+MovSolicitud.P_RUC+" : {}", cuo, filtros.get("idEntidad"));
+			}
 			if (!UtilsSCPide.isNullOrEmpty(filtros.get("idOperacion")) && Integer.parseInt(String.valueOf(filtros.get("idOperacion"))) > 0) {
-				Filter filter2 = this.sf.getCurrentSession().enableFilter(MovSolicitud.F_ID_OPERACION);
-				filter2.setParameter(MovSolicitud.P_ID_OPERACION, filtros.get("idOperacion"));
+				stringQuery.append(" AND mo.idOperacion=:"+MovSolicitud.P_ID_OPERACION);
+				filtrosActivos.put("idOperacion",true);
 				logger.info("{} Filtro "+MovSolicitud.P_ID_OPERACION+" : {}", cuo, filtros.get("idOperacion"));
 			}
 			if (!UtilsSCPide.isNullOrEmpty(filtros.get("idEstadoSolicitud")) && Integer.parseInt(String.valueOf(filtros.get("idEstadoSolicitud"))) > 0) {
-				Filter filter3 = this.sf.getCurrentSession().enableFilter(MovSolicitud.F_ID_ESTADO_SOLICITUD);
-				filter3.setParameter(MovSolicitud.P_ID_ESTADO_SOLICITUD, filtros.get("idEstadoSolicitud"));
+				stringQuery.append(" AND mes.idEstadoSolicitud=:"+MovSolicitud.P_ID_ESTADO_SOLICITUD);
+				filtrosActivos.put("idEstadoSolicitud",true);
 				logger.info("{} Filtro "+MovSolicitud.P_ID_ESTADO_SOLICITUD+" : {}", cuo, filtros.get("idEstadoSolicitud"));
-			}
-			if (!UtilsSCPide.isNullOrEmpty(filtros.get("fechaDesde")) && !UtilsSCPide.isNullOrEmpty(filtros.get("fechaHasta"))) {
-				Filter filter4 = this.sf.getCurrentSession().enableFilter(MovSolicitud.F_RANGO_FECHA);
-				filter4.setParameter(MovSolicitud.P_FECHA_DESDE, filtros.get("fechaDesde"));
-				filter4.setParameter(MovSolicitud.P_FECHA_HASTA, filtros.get("fechaHasta"));
-				logger.info("{} Filtro "+MovSolicitud.P_FECHA_DESDE+" : {}", cuo, filtros.get("fechaDesde"));
-				logger.info("{} Filtro "+MovSolicitud.P_FECHA_HASTA+" : {}", cuo, filtros.get("fechaHasta"));
-			}
-			TypedQuery<Long> queryCount = this.sf.getCurrentSession().createNamedQuery(MovSolicitud.Q_SOLICITUD_ACTIVO_COUNT_FILTER, Long.class);
-			Long countResult = queryCount.getSingleResult();
-			int lastPage = (int) Math.floor((countResult > 1 ? countResult-1 : countResult)/pageSize);
-
+			}	
+			stringQuery.append(" ORDER BY mbc.idSolicitud DESC");
+			
+			
+		    TypedQuery<MovSolicitud> query = this.sf.getCurrentSession().createQuery(stringQuery.toString(), MovSolicitud.class);
+		    query.setParameter(MovSolicitud.P_FECHA_DESDE, filtros.get("fechaDesde"));
+		    query.setParameter(MovSolicitud.P_FECHA_HASTA, filtros.get("fechaHasta"));
+		    
+		    if(filtrosActivos.get("idSolicitud")) {
+		    	query.setParameter(MovSolicitud.P_ID_SOLICITUD, filtros.get("idSolicitud"));
+		    }
+		    if(filtrosActivos.get("idEntidad")) {
+		    	query.setParameter(MovSolicitud.P_ID_ENTIDAD, filtros.get("idEntidad"));
+		    }
+		    if(filtrosActivos.get("numeroRuc")) {
+		    	query.setParameter(MovSolicitud.P_RUC, filtros.get("numeroRuc"));
+		    }
+		    if(filtrosActivos.get("idOperacion")) {
+		    	query.setParameter(MovSolicitud.P_ID_OPERACION, filtros.get("idOperacion"));
+		    }
+		    if(filtrosActivos.get("idEstadoSolicitud")) {
+		    	query.setParameter(MovSolicitud.P_ID_ESTADO_SOLICITUD, filtros.get("idEstadoSolicitud"));
+		    }
+		    
+		    Long countResult = query.getResultStream().count();
+			int lastPage = (int) Math.floor(countResult/pageSize);
+			
 			page = (page <= lastPage ? page : lastPage);
 			
 			pagination.setTotalRecords(countResult.intValue());
 			pagination.setCurrentPage(page);
 			pagination.setLastPage(lastPage);
-			
-			TypedQuery<MovSolicitud> query = this.sf.getCurrentSession().createNamedQuery(MovSolicitud.Q_SOLICITUD_BY_FILTER, MovSolicitud.class);
-			query.setFirstResult(page*pageSize);
+		    
+		    query.setFirstResult(page*pageSize);
 			query.setMaxResults(pageSize);
-			query.getResultStream().forEach(x -> {
-				lista.add(new SolicitudDTO(
-						x.getIdSolicitud(),
-						x.getEntidad().getIdEntidad(),
-						x.getEntidad().getRazonSocial(), 
-						x.getOperacion().getIdOperacion(), 
-						x.getOperacion().getNombre(), 
-						x.getNroDocumentoSolicitante(),
-						x.getNombreSolicitante(), 
-						x.getJustificacion(), 
-						UtilsSCPide.convertDateToString(x.getFechaSolicito(), ConstantesSCPide.PATTERN_FECHA_DD_MM_YYYY), 
-						UtilsSCPide.convertDateToString(x.getFechaEvaluacion(), ConstantesSCPide.PATTERN_FECHA_DD_MM_YYYY), 
-						x.getCuotaCambio(), 
-						( x.getEstadoCambio().equalsIgnoreCase(ConstantesSCPide.ESTADO_ACTIVO) ? "Activo" : "Inactivo" ),
-						x.getEstadoSolicitud().getNombreEstadoSolicitud(),
-						x.getTipoSolicitud().getNombreTipoSolicitud()));
+		    query.getResultStream().forEach(x -> {
+					lista.add(new SolicitudDTO(
+							x.getIdSolicitud(),
+							x.getEntidad().getIdEntidad(),
+							x.getEntidad().getRazonSocial(), 
+							x.getOperacion()==null ? null : x.getOperacion().getIdOperacion(), 
+							x.getOperacion()==null ? null : x.getOperacion().getNombre(), 
+							x.getNroDocumentoSolicitante(),
+							x.getNombreSolicitante(), 
+							x.getJustificacion(), 
+							UtilsSCPide.convertDateToString(x.getFechaSolicito(), ConstantesSCPide.PATTERN_FECHA_DD_MM_YYYY_HH_MM), 
+							UtilsSCPide.convertDateToString(x.getFechaEvaluacion(), ConstantesSCPide.PATTERN_FECHA_DD_MM_YYYY_HH_MM), 
+							x.getCuotaCambio(), 
+							( UtilsSCPide.isNullOrEmpty(x.getEstadoCambio())?"" :(x.getEstadoCambio().equalsIgnoreCase(ConstantesSCPide.ESTADO_ACTIVO) ? "Activo" : "Inactivo") ),
+							x.getEstadoSolicitud().getNombreEstadoSolicitud(),
+							x.getTipoSolicitud().getNombreTipoSolicitud()));
 			});
+			
 			pagination.setList(lista);
 		} catch (Exception e) {
 			pagination.setTotalRecords(0);
@@ -250,39 +286,73 @@ public class BusquedaDaoImpl implements BusquedasDao, Serializable {
 	public PaginationDTO buscarSolicitudCuota(String cuo, Map<String, Object> filtros) throws Exception {
 		PaginationDTO pagination = new PaginationDTO();
 		List<SolicitudDTO> lista = new ArrayList<>();
-		
+		Map<String, Boolean> filtrosActivos = new HashMap<>();
+		filtrosActivos.put("idSolicitud", false);
+		filtrosActivos.put("idEntidad", false);
+		filtrosActivos.put("numeroRuc", false);
+		filtrosActivos.put("idOperacion", false);
+		filtrosActivos.put("idEstadoSolicitud", false);
+		filtrosActivos.put("fechaDesde", false);
+		filtrosActivos.put("fechaHasta", false);
 		try {
 			logger.info("{} Inicio de :{}", cuo, "buscarSolicitudCuota");
+			
+			StringBuilder stringQuery = new StringBuilder("SELECT mbc FROM MovSolicitud mbc");
+			stringQuery.append(" JOIN mbc.entidad me");
+			stringQuery.append(" LEFT JOIN mbc.operacion mo");
+			stringQuery.append(" JOIN mbc.tipoSolicitud mts");
+			stringQuery.append(" JOIN mbc.estadoSolicitud mes");
+			stringQuery.append(" WHERE mbc.fechaSolicito BETWEEN : "+MovSolicitud.P_FECHA_DESDE +" AND : "+MovSolicitud.P_FECHA_HASTA);
 			if (!UtilsSCPide.isNullOrEmpty(filtros.get("idSolicitud")) && Integer.parseInt(String.valueOf(filtros.get("idSolicitud"))) > 0) {
-				this.sf.getCurrentSession().enableFilter(MovSolicitud.F_ID_SOLICITUD)
-					.setParameter(MovSolicitud.P_ID_SOLICITUD, filtros.get("idSolicitud"));
+				stringQuery.append(" AND mbc.idSolicitud =: "+MovSolicitud.P_ID_SOLICITUD);
+				filtrosActivos.put("idSolicitud",true);
+				//
+				
 				logger.info("{} Filtro "+MovSolicitud.P_ID_SOLICITUD+" : {}", cuo, filtros.get("idSolicitud"));
 			}
 			if (!UtilsSCPide.isNullOrEmpty(filtros.get("idEntidad")) && Integer.parseInt(String.valueOf(filtros.get("idEntidad"))) > 0) {
-				this.sf.getCurrentSession().enableFilter(MovSolicitud.F_ID_ENTIDAD)
-					.setParameter(MovSolicitud.P_ID_ENTIDAD, filtros.get("idEntidad"));
+				stringQuery.append(" AND me.idEntidad=: "+MovSolicitud.P_ID_ENTIDAD);
+				filtrosActivos.put("idEntidad",true);
 				logger.info("{} Filtro "+MovSolicitud.P_ID_ENTIDAD+" : {}", cuo, filtros.get("idEntidad"));
 			}
+			if (!UtilsSCPide.isNullOrEmpty(filtros.get("numeroRuc"))) {
+				stringQuery.append(" AND me.ruc=: "+MovSolicitud.P_RUC);
+				filtrosActivos.put("numeroRuc",true);
+				logger.info("{} Filtro "+MovSolicitud.P_RUC+" : {}", cuo, filtros.get("idEntidad"));
+			}
 			if (!UtilsSCPide.isNullOrEmpty(filtros.get("idOperacion")) && Integer.parseInt(String.valueOf(filtros.get("idOperacion"))) > 0) {
-				this.sf.getCurrentSession().enableFilter(MovSolicitud.F_ID_OPERACION)
-					.setParameter(MovSolicitud.P_ID_OPERACION, filtros.get("idOperacion"));
+				stringQuery.append(" AND mo.idOperacion=:"+MovSolicitud.P_ID_OPERACION);
+				filtrosActivos.put("idOperacion",true);
 				logger.info("{} Filtro "+MovSolicitud.P_ID_OPERACION+" : {}", cuo, filtros.get("idOperacion"));
 			}
 			if (!UtilsSCPide.isNullOrEmpty(filtros.get("idEstadoSolicitud")) && Integer.parseInt(String.valueOf(filtros.get("idEstadoSolicitud"))) > 0) {
-				this.sf.getCurrentSession().enableFilter(MovSolicitud.F_ID_ESTADO_SOLICITUD)
-					.setParameter(MovSolicitud.P_ID_ESTADO_SOLICITUD, filtros.get("idEstadoSolicitud"));
+				stringQuery.append(" AND mes.idEstadoSolicitud=:"+MovSolicitud.P_ID_ESTADO_SOLICITUD);
+				filtrosActivos.put("idEstadoSolicitud",true);
 				logger.info("{} Filtro "+MovSolicitud.P_ID_ESTADO_SOLICITUD+" : {}", cuo, filtros.get("idEstadoSolicitud"));
-			}
-			if (!UtilsSCPide.isNullOrEmpty(filtros.get("fechaDesde")) && !UtilsSCPide.isNullOrEmpty(filtros.get("fechaHasta"))) {
-				Filter filter4 = this.sf.getCurrentSession().enableFilter(MovSolicitud.F_RANGO_FECHA);
-				filter4.setParameter(MovSolicitud.P_FECHA_DESDE, filtros.get("fechaDesde"));
-				filter4.setParameter(MovSolicitud.P_FECHA_HASTA, filtros.get("fechaHasta"));
-				logger.info("{} Filtro "+MovSolicitud.P_FECHA_DESDE+" : {}", cuo, filtros.get("fechaDesde"));
-				logger.info("{} Filtro "+MovSolicitud.P_FECHA_HASTA+" : {}", cuo, filtros.get("fechaHasta"));
-			}
+			}	
+			stringQuery.append(" ORDER BY mbc.idSolicitud DESC");
 			
-			TypedQuery<MovSolicitud> query = this.sf.getCurrentSession().createNamedQuery(MovSolicitud.Q_SOLICITUD_BY_FILTER, MovSolicitud.class);
-			query.getResultStream().forEach(x -> {
+			
+		    TypedQuery<MovSolicitud> query = this.sf.getCurrentSession().createQuery(stringQuery.toString(), MovSolicitud.class);
+		    query.setParameter(MovSolicitud.P_FECHA_DESDE, filtros.get("fechaDesde"));
+		    query.setParameter(MovSolicitud.P_FECHA_HASTA, filtros.get("fechaHasta"));
+		    if(filtrosActivos.get("idSolicitud")) {
+		    	query.setParameter(MovSolicitud.P_ID_SOLICITUD, filtros.get("idSolicitud"));
+		    }
+		    if(filtrosActivos.get("idEntidad")) {
+		    	query.setParameter(MovSolicitud.P_ID_ENTIDAD, filtros.get("idEntidad"));
+		    }
+		    if(filtrosActivos.get("numeroRuc")) {
+		    	query.setParameter(MovSolicitud.P_RUC, filtros.get("numeroRuc"));
+		    }
+		    if(filtrosActivos.get("idOperacion")) {
+		    	query.setParameter(MovSolicitud.P_ID_OPERACION, filtros.get("idOperacion"));
+		    }
+		    if(filtrosActivos.get("idEstadoSolicitud")) {
+		    	query.setParameter(MovSolicitud.P_ID_ESTADO_SOLICITUD, filtros.get("idEstadoSolicitud"));
+		    }
+		    
+		    query.getResultStream().forEach(x -> {
 					lista.add(new SolicitudDTO(
 							x.getIdSolicitud(),
 							x.getEntidad().getIdEntidad(),
@@ -306,7 +376,7 @@ public class BusquedaDaoImpl implements BusquedasDao, Serializable {
 		}
 		return pagination;
 	}
-
+	
 	@Override
 	public DetalleSolicitudDTO buscarDetalleSolicitud(String cuo, Integer idSolicitud) throws Exception {
 		DetalleSolicitudDTO detalle = null;

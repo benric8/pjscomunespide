@@ -76,5 +76,12 @@ public class MestrosServiceImpl implements MaestrosService, Serializable{
 	public List<PerfilDTO> listarPerfilActivo(String cuo) throws Exception {
 		return dao.listarPerfilActivo(cuo);
 	}
+	
+	@Override
+	@Transactional(transactionManager = "txManagerSeguridadPide", propagation = Propagation.REQUIRES_NEW, readOnly = true, rollbackFor = { Exception.class, SQLException.class})
+	public List<OperacionDTO> listarOperacion(String cuo) throws Exception {
+		return dao.listarOperacion(cuo);
+	}
+
 
 }

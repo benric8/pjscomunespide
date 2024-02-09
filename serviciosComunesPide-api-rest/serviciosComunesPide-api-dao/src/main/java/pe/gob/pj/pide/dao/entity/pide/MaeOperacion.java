@@ -27,6 +27,7 @@ import pe.gob.pj.pide.dao.utils.ConstantesSCPide;
 @Table(name="MAE_OPERACION", schema=ConstantesSCPide.ESQUEMA_PIDE)
 @FilterDefs(value = {@FilterDef(name=MaeOperacion.F_ID_OPERACION, parameters = { @ParamDef(name="idOperacion", type="int") })})
 @Filters(value = {@Filter(name = MaeOperacion.F_ID_OPERACION, condition = "N_OPERACION=:idOperacion")})
+@NamedQuery(name = MaeOperacion.Q_OPERACION, query = "SELECT mo FROM MaeOperacion mo")
 @NamedQuery(name = MaeOperacion.Q_OPERACION_BY_ACTIVO, query = "SELECT mo FROM MaeOperacion mo WHERE mo.activo = '1' ")
 @NamedQuery(name = MaeOperacion.Q_OPERACION_ACTIVO_BY_OPERACION, query = "SELECT mo FROM MaeOperacion mo WHERE mo.activo = '1' AND upper(operacion) LIKE :operacion ORDER BY operacion ")
 @NamedQuery(name = MaeOperacion.Q_OPERACION_BY_ENDPOINT, query = "SELECT mo FROM MaeOperacion mo WHERE mo.endpoint = :endpoint")
@@ -38,6 +39,7 @@ public class MaeOperacion extends Auditoria implements Serializable{/**
 	
 	public static final String F_ID_OPERACION = "MaeOperacion.filterIdOperacion";
 	
+	public static final String Q_OPERACION = "MaeOperacion.findOperacion";
 	public static final String Q_OPERACION_BY_ACTIVO = "MaeOperacion.findByActivo";
 	public static final String Q_OPERACION_ACTIVO_BY_OPERACION = "MaeOperacion.findByActivoOperacion";
 	public static final String Q_OPERACION_BY_ENDPOINT = "MaeOperacion.findByEndpointOperacion";

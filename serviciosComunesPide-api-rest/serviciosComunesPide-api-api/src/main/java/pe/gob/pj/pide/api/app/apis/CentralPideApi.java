@@ -53,8 +53,8 @@ public class CentralPideApi implements Serializable {
 	public ResponseEntity<GlobalResponseDTO> verificarConexiones() {
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
-			res.setCodigo(ConstantesSCPide.C_200);
-			res.setDescripcion("Versión actual de aplicativo");
+			res.setCodigo(ConstantesSCPide.C_EXITO);
+			res.setDescripcion(ConstantesSCPide.X_EXITO);
 			Map<String, String> healthcheck = new HashMap<String, String>();
 			healthcheck.put("Aplicativo", "Servicios Comunes Pide API-REST");
 			healthcheck.put("Estado", "Disponible");
@@ -165,8 +165,8 @@ public class CentralPideApi implements Serializable {
 									.claim(ConstantesSCPide.CLAIM_LIMIT, UtilsSCPide.sumarRestarSegundos(ahora,  tiempoSegundosExpira + tiempoSegundosRefresh))
 									.claim(ConstantesSCPide.CLAIM_NUMERO, total + 1)
 									.compact();
-							res.setCodigo(ConstantesSCPide.C_200);
-							res.setDescripcion("Token actualizado.");
+							res.setCodigo(ConstantesSCPide.C_EXITO);
+							res.setDescripcion(ConstantesSCPide.X_EXITO);
 							res.setData(tokenResult);
 							return new ResponseEntity<>(res, HttpStatus.OK);
 						}else {

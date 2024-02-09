@@ -111,7 +111,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 				.compact();
 		response.addHeader(SecurityConstants.TOKEN_HEADER, SecurityConstants.TOKEN_PREFIX + token);
 		response.setContentType("application/json");
-		response.getWriter().write("{\"token\":\""+token+"\"}");
+		response.getWriter().write("{\"token\":\""+token+"\",\"exps\":\""+tiempoSegundosExpira+"\",\"refs\":\""+tiempoSegundosRefresh+"\"}");
 	}
 	
 	/**
