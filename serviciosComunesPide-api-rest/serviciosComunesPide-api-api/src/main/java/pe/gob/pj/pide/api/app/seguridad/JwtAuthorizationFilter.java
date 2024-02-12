@@ -96,7 +96,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 				
 				String accesoBase = (String) parsedToken.getBody().get(ConstantesSCPide.CLAIM_ACCESO);
 				String username = parsedToken.getBody().getSubject();
-				
+				String usuarioApp = (String) parsedToken.getBody().get(ConstantesSCPide.CLAIM_USUARIO);
 				
 				@SuppressWarnings("unchecked")
 				List<String> roles = (List<String>) parsedToken.getBody().get(ConstantesSCPide.CLAIM_ROL);
@@ -146,6 +146,10 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 				
 				if (!UtilsSCPide.isNullOrEmpty(username)) {
 					request.setAttribute(ConstantesSCPide.AUD_CUO, cuo);
+					if(urlReq.endsWith("registrarOperacion") || urlReq.endsWith("modificarOperacion")) {
+						request.setAttribute(ConstantesSCPide.CLAIM_USUARIO, usuarioApp);
+						
+					}
 					if(urlReq.endsWith("refresh") || urlReq.endsWith("login")) {
 						request.setAttribute(ConstantesSCPide.REMOTE_IP, remoteIp);
 						request.setAttribute(ConstantesSCPide.CLAIM_LIMIT, limiteRefreshClaim);

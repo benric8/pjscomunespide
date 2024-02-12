@@ -62,7 +62,7 @@ public class LoginApi implements Serializable {
 					res.setDescripcion(ConstantesSCPide.X_EXITO);
 					if(usuario != null){
 						String usuarioCompleto = login.getUsuario();
-						usuarioCompleto = usuarioCompleto + "-" + usuario.getApellidosNombres();
+						//usuarioCompleto = usuarioCompleto + "-" + usuario.getApellidosNombres();
 						String token  = getNewToken(login.getToken(), usuarioCompleto, usuario.getCodigoRol(), ipRemota, cuo,limit);
 						usuario.setCodigoRol("*********");
 						if(UtilsSCPide.isNull(token).length() > 0) {

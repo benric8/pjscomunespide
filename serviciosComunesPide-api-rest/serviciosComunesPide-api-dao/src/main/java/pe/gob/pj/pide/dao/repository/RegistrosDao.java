@@ -14,6 +14,6 @@ public interface RegistrosDao {
 	public boolean registrarEntidad(String cuo, RequestRegistrarEntidadDTO entidad) throws Exception;
 	public boolean registrarIpEntidad(String cuo, RequestRegistrarIpEntidadDTO ip) throws Exception;
 	public boolean modificarPermiso(String cuo, RequestModificarPermisoDTO permiso) throws Exception;
-	public boolean registrarOperacion(String cuo, RequestOperacionDTO operacion) throws Exception;
-	public boolean modificarOperacion(String cuo, RequestOperacionDTO operacion, Integer idOperacion) throws Exception;
+	public boolean registrarOperacion(String cuo, String usuario, RequestOperacionDTO operacion) throws Exception;
+	public boolean modificarOperacion(String cuo, String usuario,RequestOperacionDTO operacion, Integer idOperacion) throws Exception;
 }

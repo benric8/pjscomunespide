@@ -67,15 +67,15 @@ public class RegistrosServiceImpl implements RegistrosService, Serializable {
 	@Override
 	@Transactional(transactionManager = "txManagerSeguridadPide", propagation = Propagation.REQUIRES_NEW, timeout = 120, readOnly = false, rollbackFor = {
 			Exception.class, SQLException.class })
-	public boolean registrarOperacion(String cuo, RequestOperacionDTO operacion) throws Exception {
-		return dao.registrarOperacion(cuo, operacion);
+	public boolean registrarOperacion(String cuo, String usuario,RequestOperacionDTO operacion) throws Exception {
+		return dao.registrarOperacion(cuo, usuario, operacion);
 	}
 	
 	@Override
 	@Transactional(transactionManager = "txManagerSeguridadPide", propagation = Propagation.REQUIRES_NEW, timeout = 120, readOnly = false, rollbackFor = {
 			Exception.class, SQLException.class })
-	public boolean modificarOperacion(String cuo, RequestOperacionDTO operacion, Integer idOperacion) throws Exception {
-		return dao.modificarOperacion(cuo, operacion,idOperacion);
+	public boolean modificarOperacion(String cuo,String usuario, RequestOperacionDTO operacion, Integer idOperacion) throws Exception {
+		return dao.modificarOperacion(cuo, usuario, operacion,idOperacion);
 	}
 
 }

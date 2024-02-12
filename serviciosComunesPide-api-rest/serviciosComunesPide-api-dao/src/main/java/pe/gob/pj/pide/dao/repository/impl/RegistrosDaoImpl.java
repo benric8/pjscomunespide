@@ -579,7 +579,7 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 		return rpta;
 	}
 	@Override
-	public boolean registrarOperacion(String cuo, RequestOperacionDTO operacion) throws Exception {
+	public boolean registrarOperacion(String cuo,String usuario, RequestOperacionDTO operacion) throws Exception {
 		MaeOperacion opera;
 		TypedQuery<MaeOperacion> query = this.sf.getCurrentSession().createNamedQuery(MaeOperacion.Q_OPERACION_BY_ENDPOINT,
 				MaeOperacion.class);
@@ -607,6 +607,7 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 			opera.setCAudMcAddr(UtilsSCPide.getMac());
 			opera.setCAudPc(UtilsSCPide.getPc());
 			opera.setFechaRegistro(UtilsSCPide.getFechaActualDate());
+			opera.setXAudUsuario(usuario);
 			
 			
 			this.sf.getCurrentSession().save(opera);
@@ -615,7 +616,7 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 	}
 	
 	@Override
-	public boolean modificarOperacion(String cuo, RequestOperacionDTO operacion, Integer idOperacion) throws Exception {
+	public boolean modificarOperacion(String cuo, String usuario,RequestOperacionDTO operacion, Integer idOperacion) throws Exception {
 		
 		
 		boolean rpta=false;
@@ -650,7 +651,7 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 			operacionPrevia.setCAudMcAddr(UtilsSCPide.getMac());
 			operacionPrevia.setCAudPc(UtilsSCPide.getPc());
 			operacionPrevia.setFechaRegistro(UtilsSCPide.getFechaActualDate());
-			
+			operacionPrevia.setXAudUsuario(usuario);
 			this.sf.getCurrentSession().update(operacionPrevia);
 			
 			rpta = operacionPrevia.getIdOperacion()  > 0;

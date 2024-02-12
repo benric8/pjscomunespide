@@ -140,13 +140,13 @@ public class RegistrosApi implements Serializable{
 		return new ResponseEntity<GlobalResponseDTO>(res, HttpStatus.OK);
 	}
 	@RequestMapping(value = "/registrarOperacion", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<GlobalResponseDTO> registrarOperacion(@RequestAttribute String cuo, @Validated @RequestBody RequestOperacionDTO request){
+	public ResponseEntity<GlobalResponseDTO> registrarOperacion(@RequestAttribute String cuo, @RequestAttribute String usuario , @Validated @RequestBody RequestOperacionDTO request){
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
 			logger.info("{}Inicio de endpoint:{}",cuo,"registrarOperacion");
 			res.setCodigo(ConstantesSCPide.C_EXITO);
 			res.setDescripcion(ConstantesSCPide.X_EXITO);
-			boolean rpta = serv.registrarOperacion(cuo, request);
+			boolean rpta = serv.registrarOperacion(cuo, usuario,request);
 			if(rpta) {
 				res.setDescripcion("Registro de operacion, exitoso.");
 			}else {
@@ -162,13 +162,13 @@ public class RegistrosApi implements Serializable{
 	}
 	
 	@RequestMapping(value = "/modificarOperacion", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE,  produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<GlobalResponseDTO> modificarUsuario(@RequestAttribute String cuo, @Validated @RequestBody RequestOperacionDTO request, @RequestParam Integer idOperacion) {
+	public ResponseEntity<GlobalResponseDTO> modificarUsuario(@RequestAttribute String cuo, @RequestAttribute String usuario, @Validated @RequestBody RequestOperacionDTO request, @RequestParam Integer idOperacion) {
 		GlobalResponseDTO res = new GlobalResponseDTO();
 		try {
 			logger.info("{}Inicio de endpoint:{}",cuo,"modificarOperacion");
 			res.setCodigo(ConstantesSCPide.C_EXITO);
 			res.setDescripcion(ConstantesSCPide.X_EXITO);
-			boolean rpta = serv.modificarOperacion(cuo, request,idOperacion);
+			boolean rpta = serv.modificarOperacion(cuo, usuario, request,idOperacion);
 			if(rpta) {
 				res.setDescripcion("Modificación de Operacion, exitoso.");
 			}else {
