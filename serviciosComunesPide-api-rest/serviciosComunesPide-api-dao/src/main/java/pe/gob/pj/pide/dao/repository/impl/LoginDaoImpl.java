@@ -207,6 +207,7 @@ public class LoginDaoImpl implements LoginDao, Serializable {
 			usuarioPrevio.setUsuario(usuario.getUsuario());
 			usuarioPrevio.setPerfil(perfil);
 			usuarioPrevio.setActivo(usuario.getActivo());
+			usuarioPrevio.setApellidosNombres(usuario.getApellidosNombres().trim().toUpperCase());
 			
 			usuarioPrevio.setCAud(ConstantesSCPide.SQL_ACCION_UPDATE);
 			usuarioPrevio.setFAud(UtilsSCPide.getFechaActualDate());

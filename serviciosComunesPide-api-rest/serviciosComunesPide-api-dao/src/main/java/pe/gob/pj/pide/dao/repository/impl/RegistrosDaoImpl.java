@@ -632,6 +632,10 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 			throw new Exception("No se pudo realizar la modificación debido a que no se encontro coincidencias para la operacion ingresado.");
 		}
 		
+		if(operacionPrevia.getEndpoint().equalsIgnoreCase(operacion.getEndPoint())) {
+			throw new Exception("El endpoint ingresado ya se encuentra registrado.");
+		}
+		
 		try {
 
 			operacionPrevia.setNombre(operacion.getNombre());
