@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="DEBUG">
+	<Properties>
+		<Property name="LOG_PATTERN">%d{yyyy-MMM-dd HH:mm:ss a} [%t] %-5level
+			%logger{36} - %msg%n</Property>
+		<Property name="APP_LOG_ROOT">/opt/pe.gob.pj.log/serviciosComunesPide/api</Property>
+		<Property name="FILE_NAME">serviciosComunesPide-api.log</Property>
+	</Properties>
+	<Appenders>
+		<!-- Console Appender -->
+		<Console name="LogToConsole" target="SYSTEM_OUT">
+			<PatternLayout pattern="${LOG_PATTERN}" />
+		</Console>
+		<RollingFile name="RollingFile"
+			fileName="${APP_LOG_ROOT}/${FILE_NAME}"
+			filePattern="${APP_LOG_ROOT}/serviciosComunesPide-%d{yyyy-MM-dd}-%i.gz">
+			<PatternLayout>
+				<Pattern>%d{yyyy-MM-dd HH:mm:ss} %-5p %m%n</Pattern>
+			</PatternLayout>
+			<Policies>
+				<OnStartupTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="100 MB" />
+				<TimeBasedTriggeringPolicy />
+			</Policies>
+			<DefaultRolloverStrategy max="10" />
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<Logger name="pj.gob.pe" level="info" additivity="false">
+			<AppenderRef ref="RollingFile" />
+			<AppenderRef ref="LogToConsole" />
+		</Logger>
+		<Logger name="org.springframework.boot" level="error" additivity="false">
+			<AppenderRef ref="LogToConsole" />
+		</Logger>
+		<!-- Log everything in hibernate -->
+		<Logger name="org.hibernate" level="error" additivity="false">
+			<AppenderRef ref="LogToConsole" />
+			<AppenderRef ref="RollingFile" />
+		</Logger>
+		<!-- Log SQL statements -->
+		<Logger name="org.hibernate.SQL" level="off"
+			additivity="false">
+			<AppenderRef ref="LogToConsole" />
+			<AppenderRef ref="RollingFile" />
+		</Logger>
+		<!-- Log JDBC bind parameters -->
+		<Logger name="org.hibernate.type.descriptor.sql" level="off"
+			additivity="false">
+			<AppenderRef ref="RollingFile" />
+			<AppenderRef ref="LogToConsole" />
+		</Logger>
+		<Root level="info">
+			<AppenderRef ref="RollingFile" />
+			<AppenderRef ref="LogToConsole" />
+		</Root>
+	</Loggers>
+</Configuration>

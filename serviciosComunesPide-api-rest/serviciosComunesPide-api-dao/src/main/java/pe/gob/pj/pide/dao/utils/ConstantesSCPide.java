@@ -8,7 +8,7 @@ public class ConstantesSCPide {
 	public static final int NRO_VECES_REFRESH_CON_TOKEN_EXPIRADO = 100;
 	public static final String METHOD_CORTA_ULTIMA_BARRA_INVERTIDA = "PUT";
 	
-	public static final String VERSION = "1.0.0";
+	public static final String VERSION = "1.1.0";
 
 	public static final String ESQUEMA_SEGURIDAD = "seguridad";
 	public static final String ESQUEMA_PIDE = "pide";
