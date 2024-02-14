@@ -621,6 +621,7 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 		
 		boolean rpta=false;
 		MaeOperacion operacionPrevia;
+		
 		this.sf.getCurrentSession().enableFilter(MaeOperacion.F_ID_OPERACION)
 		.setParameter(MaeOperacion.P_ID_OPERACION, idOperacion);	
 		TypedQuery<MaeOperacion> query = this.sf.getCurrentSession().createNamedQuery(MaeOperacion.Q_FIND_BY_FILTERS,
@@ -632,9 +633,22 @@ public class RegistrosDaoImpl implements RegistrosDao, Serializable {
 			throw new Exception("No se pudo realizar la modificación debido a que no se encontro coincidencias para la operacion ingresado.");
 		}
 		
-		if(operacionPrevia.getEndpoint().equalsIgnoreCase(operacion.getEndPoint())) {
-			throw new Exception("El endpoint ingresado ya se encuentra registrado.");
+		if(!operacionPrevia.getEndpoint().equals(operacion.getEndPoint())) {
+			MaeOperacion operacionVerificarExistente;
+			this.sf.getCurrentSession().disableFilter(MaeOperacion.F_ID_OPERACION);
+			
+			this.sf.getCurrentSession().enableFilter(MaeOperacion.F_ENDPOINT_OPERACION)
+			.setParameter(MaeOperacion.P_ENDPOINT_OPERACION,operacion.getEndPoint());
+			this.sf.getCurrentSession().enableFilter(MaeOperacion.F_ID_OPERACION_NO)
+			.setParameter(MaeOperacion.P_ID_OPERACION, idOperacion);
+			TypedQuery<MaeOperacion> query_ = this.sf.getCurrentSession().createNamedQuery(MaeOperacion.Q_FIND_BY_FILTERS,
+					MaeOperacion.class);
+			operacionVerificarExistente = query_.getResultStream().findFirst().orElse(new MaeOperacion());
+			if(operacionVerificarExistente.getEndpoint()!=null) {
+				throw new Exception("El endpoint ya se encuentra registrado");
+			}
 		}
+		
 		
 		try {
 
